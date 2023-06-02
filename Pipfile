@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+flask-restx = "*"
+flask-sqlalchemy = "*"
+pyopenssl = "*"
+mysqlclient = "*"
+flask-cors = "*"
+pyjwt = "==2.6.0"
+flask-socketio = "*"
+eventlet = "*"
+gunicorn = "*"
+waitress = "*"
+flask-sockets = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"
