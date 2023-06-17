@@ -7,17 +7,22 @@ from datetime  import date, datetime, timedelta
 import jwt
 from json import dumps
 from flask_cors import CORS
-from flask_socketio import SocketIO, emit
-from flask_sockets import Sockets
-import eventlet
-from eventlet import wsgi
-from eventlet import wrap_ssl
-import ssl
+from flask_socketio import SocketIO, emit, join_room, leave_room
+import base64
+import cv2
+import numpy as np
+import mediapipe as mp
+from tensorflow import keras
+# from flask_sockets import Sockets
+# import eventlet
+# from eventlet import wsgi
+# from eventlet import wrap_ssl
+# import ssl
 
 
 async_mode = 'None'
 app = Flask(__name__)
-sockets = SocketIO(app)
+socketio = SocketIO(app,async_mode=None)
 # sockets = Sockets(app)
 # socketio = SocketIO(app, cors_allowed_origins='*')
 CORS(app)
@@ -62,6 +67,37 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ECHO"] = True
 
 db = SQLAlchemy(app)
+
+def point():
+    x = [
+        'x12', 'x13', 'x14', 'x15', 'x16', 'x17', 'x18', 'x19', 'x20', 'x21', 'x22',
+        'x23', 'x24', 'x25', 'x26', 'x27', 'x28', 'x29', 'x30', 'x31', 'x32', 'x33',
+    ]
+    y = [
+        'y12', 'y13', 'y14', 'y15', 'y16', 'y17', 'y18', 'y19', 'y20', 'y21', 'y22',
+        'y23', 'y24', 'y25', 'y26', 'y27', 'y28', 'y29', 'y30', 'y31', 'y32', 'y33',
+    ]
+    z = [
+        'z12', 'z13', 'z14', 'z15', 'z16', 'z17', 'z18', 'z19', 'z20', 'z21', 'z22',
+        'z23', 'z24', 'z25', 'z26', 'z27', 'z28', 'z29', 'z30', 'z31', 'z32', 'z33',
+    ]
+    v = [
+        'v12', 'v13', 'v14', 'v15', 'v16', 'v17', 'v18', 'v19', 'v20', 'v21', 'v22',
+        'v23', 'v24', 'v25', 'v26', 'v27', 'v28', 'v29', 'v30', 'v31', 'v32', 'v33',
+    ]
+    coords = [x, y, z, v]
+    return coords
+
+def base64_to_image(base64_string):
+    # Extract the base64 encoded binary data from the input string
+    base64_data = base64_string.split(",")[1]
+    # Decode the base64 data to bytes
+    image_bytes = base64.b64decode(base64_data)
+    # Convert the bytes to numpy array
+    image_array = np.frombuffer(image_bytes, dtype=np.uint8)
+    # Decode the numpy array as an image using OpenCV
+    image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+    return image
 
 def decode(jwtToken):
     #Vulnerable
@@ -160,12 +196,6 @@ parser4UpdateNohp.add_argument('no_hp_baru', type=str, location='json', required
 parser4UpdateNohp.add_argument('email', type=str, location='json', required=False, help='Email')
 
 
-# @socketio.on('my_custom_event')
-# def handle_custom_event(data):
-#     # Process WebSocket message
-#     # Ensure that this route does not interfere with the API endpoint
-#     print(data)
-#     return data
 
 @api.route('/update_nohp')
 class Update_Nohp(Resource):
@@ -413,7 +443,7 @@ class C_Email_Route(Resource):
             'message' : 'Email tidak terdaftar'
         }, 200  
 
-@api.route('/users')
+@api.route('/users',methods=['GET', 'POST', 'PUT'])
 class User_Route(Resource):
     @api.expect(parser4SignUp)
     @api.response(201, 'Created')
@@ -465,15 +495,21 @@ class User_Route(Resource):
     @api.doc(security='Bearer')
     @api.expect(parser4UpdateUser)
     def put(self):
-        args = parser4UpdateUser.parse_args()
+        print(request.json)
+        try:
+            args = request.get_json()
+        except:
+            return 1
         auth = request.headers.get('Authorization')
         jwtToken = auth[7:]
         no_hp = args['no_hp']
         email = args['email']
         nama = args['nama']
-        usia_kandungan = args['usia_kandungan']
-        tanggal_lahir = args['tanggal_lahir']
-        if tanggal_lahir:
+        if args['usia_kandungan']:
+            usia_kandungan = args['usia_kandungan']
+        
+        if args['tanggal_lahir']:
+            tanggal_lahir = args['tanggal_lahir']
             tanggal_lahir = tanggal_lahir.split("/")
             tanggal_lahir = date(int(tanggal_lahir[2]),int(tanggal_lahir[1]),int(tanggal_lahir[0]))
 
@@ -495,19 +531,17 @@ class User_Route(Resource):
         if nama:
             userdb.nama = nama
             isUpdate = True
-        if usia_kandungan:
+        if args['usia_kandungan']:
             userdb.usia_kandungan = usia_kandungan
             isUpdate = True
-        if tanggal_lahir:
+        if args['tanggal_lahir']:
             userdb.tanggal_lahir = tanggal_lahir
             isUpdate = True
 
         if isUpdate:
             db.session.commit()
 
-        return {
-            'message' : 'Data berhasil diupdate mom'
-        }, 200
+        return args, 200
 
 @api.route('/signin')
 class SignIn(Resource):
@@ -548,9 +582,289 @@ class SignIn(Resource):
                 'token': token
             }, 200
         
-# @sockets.route('/ws')
-# def handle_websocket(ws):
-#     return 1
+@socketio.on('connect')
+def handle_connect():
+    print('Client connected')
+    emit("my response", {"data": "Connected"})   
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print('Client disconnected')
+
+@socketio.on_error()
+def handle_error(e):
+    print('An error occurred:', str(e))
+
+@socketio.on('message')
+def handle_message(data):
+    print('Received message:', data)
+    emit('response', 'Server received message: ' + data)
+
+@socketio.on("image")
+def handle_image(imageData):
+    try:
+        image_data_bytes = base64.b64decode(imageData['imageData'])
+        image_array = np.frombuffer(image_data_bytes, dtype=np.uint8)
+        decoded_image = cv2.imdecode(image_array, cv2.IMREAD_UNCHANGED)
+        mp_drawing = mp.solutions.drawing_utils # Drawing helpers.
+        mp_holistic = mp.solutions.holistic     # Mediapipe Solutions.
+        with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
+            image = cv2.cvtColor(decoded_image, cv2.COLOR_BGR2RGB)
+            image = cv2.resize(image, (340, 180), interpolation=cv2.INTER_LINEAR)
+
+            # Make Detections
+            # start_time = time.time()
+            results = holistic.process(image)
+            # end_time = time.time()
+
+            # execution_time = end_time - start_time
+            # print("Execution time:", execution_time, "seconds")
+
+            # Recolor image back to BGR for rendering
+            image.flags.writeable = True
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+
+            # Pose Detections
+            mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS,
+                                                mp_drawing.DrawingSpec(color=(245,117,66), thickness=2, circle_radius=4),
+                                                mp_drawing.DrawingSpec(color=(245,66,230), thickness=2, circle_radius=2)
+                                    )
+            # Export coordinates
+            try:
+          # Extract Pose landmarks
+                pose = results.pose_landmarks.landmark
+                pose_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for landmark in pose]).flatten())
+
+                # Concate rows
+                row = pose_row
+                # print(f'type: {type(row)}, \n{row}')
+
+                # point[11] - point[32] input to tflite model.
+                coords = point()
+                specify_float = 8
+
+                dict_p12_to_p33 = {
+                    # x12 to x33
+                    coords[0][0]:round(row[44], specify_float),
+                    coords[0][1]:round(row[48], specify_float),
+                    coords[0][2]:round(row[52], specify_float),
+                    coords[0][3]:round(row[56], specify_float),
+                    coords[0][4]:round(row[60], specify_float),
+                    coords[0][5]:round(row[64], specify_float),
+                    coords[0][6]:round(row[68], specify_float),
+                    coords[0][7]:round(row[72], specify_float),
+                    coords[0][8]:round(row[76], specify_float),
+                    coords[0][9]:round(row[80], specify_float),
+                    coords[0][10]:round(row[84], specify_float),
+                    coords[0][11]:round(row[88], specify_float),
+                    coords[0][12]:round(row[92], specify_float),
+                    coords[0][13]:round(row[96], specify_float),
+                    coords[0][14]:round(row[100], specify_float),
+                    coords[0][15]:round(row[104], specify_float),
+                    coords[0][16]:round(row[108], specify_float),
+                    coords[0][17]:round(row[112], specify_float),
+                    coords[0][18]:round(row[116], specify_float),
+                    coords[0][19]:round(row[120], specify_float),
+                    coords[0][20]:round(row[124], specify_float),
+                    coords[0][21]:round(row[128], specify_float),
+
+                    # y12 to y33
+                    coords[1][0]:round(row[45], specify_float),
+                    coords[1][1]:round(row[49], specify_float),
+                    coords[1][2]:round(row[53], specify_float),
+                    coords[1][3]:round(row[57], specify_float),
+                    coords[1][4]:round(row[61], specify_float),
+                    coords[1][5]:round(row[65], specify_float),
+                    coords[1][6]:round(row[69], specify_float),
+                    coords[1][7]:round(row[73], specify_float),
+                    coords[1][8]:round(row[77], specify_float),
+                    coords[1][9]:round(row[81], specify_float),
+                    coords[1][10]:round(row[85], specify_float),
+                    coords[1][11]:round(row[89], specify_float),
+                    coords[1][12]:round(row[93], specify_float),
+                    coords[1][13]:round(row[97], specify_float),
+                    coords[1][14]:round(row[101], specify_float),
+                    coords[1][15]:round(row[105], specify_float),
+                    coords[1][16]:round(row[109], specify_float),
+                    coords[1][17]:round(row[113], specify_float),
+                    coords[1][18]:round(row[117], specify_float),
+                    coords[1][19]:round(row[121], specify_float),
+                    coords[1][20]:round(row[125], specify_float),
+                    coords[1][21]:round(row[129], specify_float),
+
+                    # z12 to z33
+                    coords[2][0]:round(row[46], specify_float),
+                    coords[2][1]:round(row[50], specify_float),
+                    coords[2][2]:round(row[54], specify_float),
+                    coords[2][3]:round(row[58], specify_float),
+                    coords[2][4]:round(row[62], specify_float),
+                    coords[2][5]:round(row[66], specify_float),
+                    coords[2][6]:round(row[70], specify_float),
+                    coords[2][7]:round(row[74], specify_float),
+                    coords[2][8]:round(row[78], specify_float),
+                    coords[2][9]:round(row[82], specify_float),
+                    coords[2][10]:round(row[86], specify_float),
+                    coords[2][11]:round(row[90], specify_float),
+                    coords[2][12]:round(row[94], specify_float),
+                    coords[2][13]:round(row[98], specify_float),
+                    coords[2][14]:round(row[102], specify_float),
+                    coords[2][15]:round(row[106], specify_float),
+                    coords[2][16]:round(row[110], specify_float),
+                    coords[2][17]:round(row[114], specify_float),
+                    coords[2][18]:round(row[118], specify_float),
+                    coords[2][19]:round(row[122], specify_float),
+                    coords[2][20]:round(row[126], specify_float),
+                    coords[2][21]:round(row[130], specify_float),
+
+                    # v12 to v33
+                    coords[3][0]:round(row[47], specify_float),
+                    coords[3][1]:round(row[51], specify_float),
+                    coords[3][2]:round(row[55], specify_float),
+                    coords[3][3]:round(row[59], specify_float),
+                    coords[3][4]:round(row[63], specify_float),
+                    coords[3][5]:round(row[67], specify_float),
+                    coords[3][6]:round(row[71], specify_float),
+                    coords[3][7]:round(row[75], specify_float),
+                    coords[3][8]:round(row[79], specify_float),
+                    coords[3][9]:round(row[83], specify_float),
+                    coords[3][10]:round(row[87], specify_float),
+                    coords[3][11]:round(row[91], specify_float),
+                    coords[3][12]:round(row[95], specify_float),
+                    coords[3][13]:round(row[99], specify_float),
+                    coords[3][14]:round(row[103], specify_float),
+                    coords[3][15]:round(row[107], specify_float),
+                    coords[3][16]:round(row[111], specify_float),
+                    coords[3][17]:round(row[115], specify_float),
+                    coords[3][18]:round(row[119], specify_float),
+                    coords[3][19]:round(row[123], specify_float),
+                    coords[3][20]:round(row[127], specify_float),
+                    coords[3][21]:round(row[131], specify_float),
+                }
+                #input coordinat to predict
+                input_dict = {name: np.expand_dims(np.array(value, dtype=np.float32), axis=0) for name, value in dict_p12_to_p33.items()}
+                # print(input_dict)
+
+                # Make Detections
+                # result = tflite_inference(input=input_dict, model=model)
+                model = keras.models.load_model('./model/model_train_pose.h5')
+                result = model.predict(input_dict)
+                result = result[0]
+                # print(result)
+                body_language_class = np.argmax(result)
+                # body_language_prob = round(result[np.argmax(result)], 2)*100
+                body_language_prob = result[np.argmax(result)]
+                # print('asd')
+
+                # 0: bird-dog-pose, 1: cat-cow-pose, 2: child-pose, 3: glute-bridge, 4: lateral-leg-raise, 5: malasana, 6: side-band,
+                # 7: sideclamp, 8: putar-badan
+
+                if str(body_language_class) == '0':
+                    pose_class = 'Bird Dog Pose'
+                elif str(body_language_class) == '1':
+                    pose_class = 'Cat Cow Pose'
+                elif str(body_language_class) == '2':
+                    pose_class = 'Child Pose'
+                elif str(body_language_class) == '3':
+                    pose_class = 'Bridge Pose'
+                elif str(body_language_class) == '4':
+                    pose_class = 'Lateral Leg Raise'
+                elif str(body_language_class) == '5':
+                    pose_class = 'Malasana Pose'
+                elif str(body_language_class) == '6':
+                    pose_class = 'Side Band Pose'
+                elif str(body_language_class) == '7':
+                    pose_class = 'Side Clamp Pose'
+                elif str(body_language_class) == '8':
+                    pose_class = 'Putar Badan Pose'
+                else:
+                    pose_class = 'GAK KEDETEKSI'
+
+                print(f'class: {body_language_class}, prob: {body_language_prob}')
+
+                # pose_class = 'asd'
+                # body_language_prob = '0.01212'
+
+                # Show pose category near the ear.
+                coords = tuple(np.multiply(
+                    np.array(
+                        (results.pose_landmarks.landmark[mp_holistic.PoseLandmark.LEFT_EAR].x,
+                        results.pose_landmarks.landmark[mp_holistic.PoseLandmark.LEFT_EAR].y)),
+                    [1280,480]
+                ).astype(int))
+
+                # # cv2.rectangle(影像, 頂點座標, 對向頂點座標, 顏色, 線條寬度).
+                # # cv2.putText(影像, 文字, 座標, 字型, 大小, 顏色, 線條寬度, 線條種類).
+                # cv2.rectangle(image,
+                #             (coords[0], coords[1]+5),
+                #             (coords[0]+200, coords[1]-30),
+                #             (245, 117, 16), -1)
+                # cv2.putText(image, pose_class, coords,
+                #             cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+
+                # # Get status box
+                # cv2.rectangle(image, (10,0), (310, 55), (0, 0, 0), -1)
+
+                # # Display Class
+                # cv2.putText(
+                #     image,
+                #     'CLASS: ', (15, 25),
+                #     cv2.FONT_HERSHEY_SIMPLEX,
+                #     0.9, (255, 255, 0), 1, cv2.LINE_AA
+                # )
+                # cv2.putText(
+                #     image,
+                #     pose_class, (120, 25),
+                #     cv2.FONT_HERSHEY_SIMPLEX,
+                #     1, (255, 255, 255), 2, cv2.LINE_AA
+                # )
+
+                # # Display Probability
+                # cv2.putText(
+                #     image,
+                #     'PROB: ', (15, 50),
+                #     cv2.FONT_HERSHEY_SIMPLEX,
+                #     0.9, (255, 255, 0), 1, cv2.LINE_AA
+                # )
+                # cv2.putText(
+                #     image,
+                #     str(body_language_prob), (120, 50),
+                #     cv2.FONT_HERSHEY_SIMPLEX,
+                #     1, (255, 255, 255), 2, cv2.LINE_AA
+                # )
+
+            except:
+                pass
+
+
+        # print('Received image data length:', len(imageData))
+        # image_data_bytes = base64.b64decode(imageData['imageData'])
+        # image_array = np.frombuffer(image_data_bytes, dtype=np.uint8)
+        # decoded_image = cv2.imdecode(image_array, cv2.IMREAD_UNCHANGED)
+
+        # print('Decoded image array shape:', decoded_image.shape)
+        # height, width, channels = decoded_image.shape
+
+        # print('Height:', height)
+        # print('Width:', width)
+        # print('Channels:', channels)
+
+        # expected_shape = (height, width, channels)
+        # if decoded_image.shape != expected_shape:
+        #     print(f"Error: Invalid image shape. Expected: {expected_shape}, Actual: {decoded_image.shape}")
+        #     return
+
+        # image_rgb = cv2.cvtColor(decoded_image, cv2.COLOR_BGR2RGB)
+
+        processed_image_bytes = cv2.imencode('.jpg', image)[1].tobytes()
+        processed_image_data = base64.b64encode(processed_image_bytes).decode('utf-8')
+        prob = str(body_language_prob)
+
+        emit('imageResponse', {"imageData": processed_image_data,"pose_class": pose_class, "prob": prob})
+
+    except Exception as e:
+        print('Error processing image:', e)
+
 
 application = app.wsgi_app     
 
@@ -597,7 +911,7 @@ if __name__ == '__main__':
     # wrapped_socket = wrap_ssl(eventlet.listen(('0.0.0.0', 5000)), application, certfile=cert_path, keyfile=key_path, server_side=True, ssl_version=ssl.PROTOCOL_TLS, debug=True)
     # wsgi.server(wrapped_socket)
 
-    # sockets.run(app, debug=True, host='0.0.0.0')
+    socketio.run(app, debug=True, host='0.0.0.0')
 
 
-    app.run(debug=True, host='0.0.0.0', ssl_context='adhoc')
+    # app.run(debug=True, host='0.0.0.0', ssl_context='adhoc')
