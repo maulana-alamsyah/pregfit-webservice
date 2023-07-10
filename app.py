@@ -3,6 +3,7 @@ from flask_restx import Resource, Api, Namespace, reqparse
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.datastructures import FileStorage
 from datetime  import date, datetime, timedelta
 import jwt
 from json import dumps
@@ -13,6 +14,9 @@ import cv2
 import numpy as np
 import mediapipe as mp
 from tensorflow import keras
+import time
+import os
+import imghdr
 # from flask_sockets import Sockets
 # import eventlet
 # from eventlet import wsgi
@@ -26,6 +30,12 @@ socketio = SocketIO(app,async_mode=None)
 # sockets = Sockets(app)
 # socketio = SocketIO(app, cors_allowed_origins='*')
 CORS(app)
+UPLOAD_FOLDER = './uploads/'
+TEMP_FOLDER = './temp/'
+ALLOWED_EXTENSIONS = {'mp4', 'avi'}
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['TEMP_FOLDER'] = TEMP_FOLDER
 blueprint = Blueprint('api', __name__, url_prefix='/api')
 app.register_blueprint(blueprint)
 
@@ -98,6 +108,261 @@ def base64_to_image(base64_string):
     # Decode the numpy array as an image using OpenCV
     image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
     return image
+
+def is_video_file(file_storage):
+    video_formats = ['mp4', 'avi', 'mov', 'mkv']  # Add more video formats as needed
+    
+    file_type = imghdr.what(file_storage.stream)
+    if file_type is not None and file_type in video_formats:
+        return True
+    else:
+        return False
+    
+def clasify_video(cap, upload):
+    if (cap.isOpened() == False):
+                print("Error opening the video file.")
+    else:
+        input_fps = cap.get(cv2.CAP_PROP_FPS)
+        frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        output_fps = input_fps - 1
+        print(f'Frames per second: {input_fps}')
+        print(f'Frame count: {frame_count}')
+
+    w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    print(f'video_w: {w}, video_h: {h}')
+
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    if upload:
+        out = cv2.VideoWriter(upload, fourcc, output_fps, (340, 180))
+
+    mp_drawing = mp.solutions.drawing_utils # Drawing helpers.
+    mp_holistic = mp.solutions.holistic     # Mediapipe Solutions.
+    # Initiate holistic model
+    with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
+        count = 0
+        while cap.isOpened():
+            ret, frame = cap.read()
+
+
+            if ret == True:
+                count += 1
+                if count < input_fps/3:
+                    # image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    image = cv2.resize(frame, (340, 180), interpolation=cv2.INTER_LINEAR)
+                    out.write(image)
+                    continue
+                else:
+                    count = 0
+                    image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    image = cv2.resize(image, (340, 180), interpolation=cv2.INTER_LINEAR)
+
+                    image.flags.writeable = False
+                    results = holistic.process(image)
+                    # Recolor image back to BGR for rendering
+                    image.flags.writeable = True
+                    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+                    # Pose Detections
+                    mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS,
+                                            mp_drawing.DrawingSpec(color=(245,117,66), thickness=2, circle_radius=4),
+                                            mp_drawing.DrawingSpec(color=(245,66,230), thickness=2, circle_radius=2)
+                                            )
+                    # Export coordinates
+                    try:
+                        # Extract Pose landmarks
+                        pose = results.pose_landmarks.landmark
+                        pose_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for landmark in pose]).flatten())
+                        # Concate rows
+                        row = pose_row
+                        # print(f'type: {type(row)}, \n{row}')
+                        # point[11] - point[32] input to tflite model.
+                        coords = point()
+                        specify_float = 8
+                        dict_p12_to_p33 = {
+                            # x12 to x33
+                            coords[0][0]:round(row[44], specify_float),
+                            coords[0][1]:round(row[48], specify_float),
+                            coords[0][2]:round(row[52], specify_float),
+                            coords[0][3]:round(row[56], specify_float),
+                            coords[0][4]:round(row[60], specify_float),
+                            coords[0][5]:round(row[64], specify_float),
+                            coords[0][6]:round(row[68], specify_float),
+                            coords[0][7]:round(row[72], specify_float),
+                            coords[0][8]:round(row[76], specify_float),
+                            coords[0][9]:round(row[80], specify_float),
+                            coords[0][10]:round(row[84], specify_float),
+                            coords[0][11]:round(row[88], specify_float),
+                            coords[0][12]:round(row[92], specify_float),
+                            coords[0][13]:round(row[96], specify_float),
+                            coords[0][14]:round(row[100], specify_float),
+                            coords[0][15]:round(row[104], specify_float),
+                            coords[0][16]:round(row[108], specify_float),
+                            coords[0][17]:round(row[112], specify_float),
+                            coords[0][18]:round(row[116], specify_float),
+                            coords[0][19]:round(row[120], specify_float),
+                            coords[0][20]:round(row[124], specify_float),
+                            coords[0][21]:round(row[128], specify_float),
+
+                            # y12 to y33
+                            coords[1][0]:round(row[45], specify_float),
+                            coords[1][1]:round(row[49], specify_float),
+                            coords[1][2]:round(row[53], specify_float),
+                            coords[1][3]:round(row[57], specify_float),
+                            coords[1][4]:round(row[61], specify_float),
+                            coords[1][5]:round(row[65], specify_float),
+                            coords[1][6]:round(row[69], specify_float),
+                            coords[1][7]:round(row[73], specify_float),
+                            coords[1][8]:round(row[77], specify_float),
+                            coords[1][9]:round(row[81], specify_float),
+                            coords[1][10]:round(row[85], specify_float),
+                            coords[1][11]:round(row[89], specify_float),
+                            coords[1][12]:round(row[93], specify_float),
+                            coords[1][13]:round(row[97], specify_float),
+                            coords[1][14]:round(row[101], specify_float),
+                            coords[1][15]:round(row[105], specify_float),
+                            coords[1][16]:round(row[109], specify_float),
+                            coords[1][17]:round(row[113], specify_float),
+                            coords[1][18]:round(row[117], specify_float),
+                            coords[1][19]:round(row[121], specify_float),
+                            coords[1][20]:round(row[125], specify_float),
+                            coords[1][21]:round(row[129], specify_float),
+
+                            # z12 to z33
+                            coords[2][0]:round(row[46], specify_float),
+                            coords[2][1]:round(row[50], specify_float),
+                            coords[2][2]:round(row[54], specify_float),
+                            coords[2][3]:round(row[58], specify_float),
+                            coords[2][4]:round(row[62], specify_float),
+                            coords[2][5]:round(row[66], specify_float),
+                            coords[2][6]:round(row[70], specify_float),
+                            coords[2][7]:round(row[74], specify_float),
+                            coords[2][8]:round(row[78], specify_float),
+                            coords[2][9]:round(row[82], specify_float),
+                            coords[2][10]:round(row[86], specify_float),
+                            coords[2][11]:round(row[90], specify_float),
+                            coords[2][12]:round(row[94], specify_float),
+                            coords[2][13]:round(row[98], specify_float),
+                            coords[2][14]:round(row[102], specify_float),
+                            coords[2][15]:round(row[106], specify_float),
+                            coords[2][16]:round(row[110], specify_float),
+                            coords[2][17]:round(row[114], specify_float),
+                            coords[2][18]:round(row[118], specify_float),
+                            coords[2][19]:round(row[122], specify_float),
+                            coords[2][20]:round(row[126], specify_float),
+                            coords[2][21]:round(row[130], specify_float),
+
+                            # v12 to v33
+                            coords[3][0]:round(row[47], specify_float),
+                            coords[3][1]:round(row[51], specify_float),
+                            coords[3][2]:round(row[55], specify_float),
+                            coords[3][3]:round(row[59], specify_float),
+                            coords[3][4]:round(row[63], specify_float),
+                            coords[3][5]:round(row[67], specify_float),
+                            coords[3][6]:round(row[71], specify_float),
+                            coords[3][7]:round(row[75], specify_float),
+                            coords[3][8]:round(row[79], specify_float),
+                            coords[3][9]:round(row[83], specify_float),
+                            coords[3][10]:round(row[87], specify_float),
+                            coords[3][11]:round(row[91], specify_float),
+                            coords[3][12]:round(row[95], specify_float),
+                            coords[3][13]:round(row[99], specify_float),
+                            coords[3][14]:round(row[103], specify_float),
+                            coords[3][15]:round(row[107], specify_float),
+                            coords[3][16]:round(row[111], specify_float),
+                            coords[3][17]:round(row[115], specify_float),
+                            coords[3][18]:round(row[119], specify_float),
+                            coords[3][19]:round(row[123], specify_float),
+                            coords[3][20]:round(row[127], specify_float),
+                            coords[3][21]:round(row[131], specify_float),
+                        }
+                        input_dict = {name: np.expand_dims(np.array(value, dtype=np.float32), axis=0) for name, value in dict_p12_to_p33.items()}
+                        # Make Detections.
+                        model = keras.models.load_model('./model/model_train_pose.h5')
+                        result = model.predict(input_dict)
+                        result = result[0]
+                        body_language_class = np.argmax(result)
+                        # body_language_prob = round(result[np.argmax(result)], 2)*100
+                        body_language_prob = result[np.argmax(result)]
+
+                        # 0: bird-dog-pose, 1: cat-cow-pose, 2: child-pose, 3: glute-bridge, 4: lateral-leg-raise, 5: side-bend, 6: sideclamp , 7: savasana
+
+                        if str(body_language_class) == '0':
+                            pose_class = 'Bird Dog Pose'
+                        elif str(body_language_class) == '1':
+                            pose_class = 'Cat Cow Pose'
+                        elif str(body_language_class) == '2':
+                            pose_class = 'Child Pose'
+                        elif str(body_language_class) == '3':
+                            pose_class = 'Glute Bridge'
+                        elif str(body_language_class) == '4':
+                            pose_class = 'Lateral Leg Raise'
+                        elif str(body_language_class) == '5':
+                            pose_class = 'Side Band'
+                        elif str(body_language_class) == '6':
+                            pose_class = 'Side Clamp'
+                        elif str(body_language_class) == '7':
+                            pose_class = 'Savasana'
+                        else:
+                            pose_class = 'GAK KEDETEKSI'
+
+                        print(f'class: {body_language_class}, prob: {body_language_prob}')
+
+                        # Show pose category near the ear.
+                        coords = tuple(np.multiply(
+                            np.array(
+                                (results.pose_landmarks.landmark[mp_holistic.PoseLandmark.LEFT_EAR].x,
+                                results.pose_landmarks.landmark[mp_holistic.PoseLandmark.LEFT_EAR].y)),
+                            [1280,480]
+                        ).astype(int))
+                        cv2.rectangle(image,
+                                    (coords[0], coords[1]+5),
+                                    (coords[0]+200, coords[1]-30),
+                                    (245, 117, 16), -1)
+                        cv2.putText(image, pose_class, coords,
+                                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+                        # Get status box
+                        cv2.rectangle(image, (10,0), (310, 55), (0, 0, 0), -1)
+
+                        # Display Class
+                        cv2.putText(
+                            image,
+                            'CLASS: ', (15, 25),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            0.9, (255, 255, 0), 1, cv2.LINE_AA
+                        )
+                        cv2.putText(
+                            image,
+                            pose_class, (120, 25),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            1, (255, 255, 255), 2, cv2.LINE_AA
+                        )
+
+                        # Display Probability
+                        cv2.putText(
+                            image,
+                            'PROB: ', (15, 50),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            0.9, (255, 255, 0), 1, cv2.LINE_AA
+                        )
+                        cv2.putText(
+                            image,
+                            str(body_language_prob), (120, 50),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            1, (255, 255, 255), 2, cv2.LINE_AA
+                        )
+                    except:
+                        pass
+
+                    out.write(image)
+
+                    if cv2.waitKey(10) & 0xFF == ord('q'):
+                        break
+
+            else:
+                break
+    cap.release()
+    out.release()
+    cv2.destroyAllWindows()
 
 def decode(jwtToken):
     #Vulnerable
@@ -195,7 +460,47 @@ parser4UpdateNohp = reqparse.RequestParser()
 parser4UpdateNohp.add_argument('no_hp_baru', type=str, location='json', required=False, help='Nomor HP')
 parser4UpdateNohp.add_argument('email', type=str, location='json', required=False, help='Email')
 
+upload_parser = reqparse.RequestParser()
+upload_parser.add_argument('file', location='files', type=FileStorage, required=True)
 
+@api.route('/upload')
+class Upload(Resource):
+    @api.doc(security='Bearer')
+    @api.expect(upload_parser)
+    def post(self):
+        start_time_1 = time.time()
+        args = upload_parser.parse_args()
+        uploaded_file = args['file']
+        auth = request.headers.get('Authorization')
+        try:
+            jwtToken = auth[7:]
+            payload = decode(jwtToken)
+            
+            user = db.session.execute(db.select(User).filter_by(id=payload['user_id'])).first()
+            user = user[0]
+
+            timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+            filename = user.nama + '_' + str(user.id) + timestamp + '.mp4'
+            result_out = UPLOAD_FOLDER + filename
+            temp_file = TEMP_FOLDER + filename
+            if not uploaded_file.content_type.startswith('video/'):
+                return {'message': 'Tipe file tidak valid, pastikan upload file video mom'}, 400
+            uploaded_file.save(temp_file)
+            cap = cv2.VideoCapture(temp_file)
+            end_time = time.time()
+
+            start_time = time.time()
+            clasify_video(cap, result_out)
+            end_time = time.time()
+            execution_time = end_time - start_time
+            print("Execution time:", execution_time, "seconds")
+            
+            if os.path.exists(temp_file):
+                os.remove(temp_file)
+            return {'url': filename}, 201
+
+        except:
+            return {'message': 'Token tidak valid, silahkan masuk dulu mom'}, 401
 
 @api.route('/update_nohp')
 class Update_Nohp(Resource):
@@ -371,7 +676,7 @@ class History_Route(Resource):
         except:
             return {'message': 'Token tidak valid, silahkan masuk dulu mom'}, 401
 
-        return result, 200
+        return result[::-1], 200
     
 
 @api.route('/popular')

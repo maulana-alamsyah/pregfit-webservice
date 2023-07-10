@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+flask = "*"
 flask-restx = "*"
 flask-sqlalchemy = "*"
 pyopenssl = "*"
@@ -11,14 +12,9 @@ mysqlclient = "*"
 flask-cors = "*"
 pyjwt = "==2.6.0"
 flask-socketio = "*"
-eventlet = "*"
-gunicorn = "*"
-waitress = "*"
-flask-sockets = "*"
-numpy = "*"
 mediapipe = "==0.8.10"
-protobuf = "==3.20"
 tensorflow = "==2.12.0"
+flask-sockets = "*"
 
 [dev-packages]
 
