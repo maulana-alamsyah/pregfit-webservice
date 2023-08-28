@@ -1070,7 +1070,6 @@ def handle_image(imageData):
 
                 # 0: bird-dog-pose, 1: cat-cow-pose, 2: child-pose, 3: glute-bridge, 4: lateral-leg-raise, 5: malasana, 6: side-band,
                 # 7: sideclamp, 8: putar-badan
-
                 if str(body_language_class) == '0':
                     pose_class = 'Bird Dog Pose'
                 elif str(body_language_class) == '1':
@@ -1078,17 +1077,15 @@ def handle_image(imageData):
                 elif str(body_language_class) == '2':
                     pose_class = 'Child Pose'
                 elif str(body_language_class) == '3':
-                    pose_class = 'Bridge Pose'
+                    pose_class = 'Glute Bridge Pose'
                 elif str(body_language_class) == '4':
-                    pose_class = 'Lateral Leg Raise'
+                    pose_class = 'Lateral Leg Raise Pose'
                 elif str(body_language_class) == '5':
-                    pose_class = 'Malasana Pose'
+                    pose_class = 'Side Bend Pose'
                 elif str(body_language_class) == '6':
-                    pose_class = 'Side Band Pose'
-                elif str(body_language_class) == '7':
                     pose_class = 'Side Clamp Pose'
-                elif str(body_language_class) == '8':
-                    pose_class = 'Putar Badan Pose'
+                elif str(body_language_class) == '7':
+                    pose_class = 'Savasana Pose'
                 else:
                     pose_class = 'GAK KEDETEKSI'
 
