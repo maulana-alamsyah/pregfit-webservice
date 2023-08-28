@@ -12,7 +12,7 @@ mysqlclient = "*"
 flask-cors = "*"
 pyjwt = "==2.6.0"
 flask-socketio = "*"
-mediapipe = "==0.8.10"
+mediapipe = "*"
 tensorflow = "==2.12.0"
 flask-sockets = "*"
 

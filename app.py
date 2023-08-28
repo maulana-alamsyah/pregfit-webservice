@@ -439,7 +439,8 @@ parser4CheckEmail = reqparse.RequestParser()
 parser4CheckEmail.add_argument('email', type=str, location='json', required=True, help='Email')
 
 parser4SignIn = reqparse.RequestParser()
-parser4SignIn.add_argument('no_hp', type=str, location='json', required=True, help='Nomor HP')
+parser4SignIn.add_argument('Authorization', type=str, location='headers', required=True, help='Nomor HP base64')
+
 
 parser4UpdateUser = reqparse.RequestParser()
 parser4UpdateUser.add_argument('no_hp', type=str, location='json', required=False, help='Nomor HP')
@@ -764,6 +765,7 @@ class User_Route(Resource):
         
         user = User()
         user.no_hp = no_hp
+        user.tanggal_lahir = '1999-01-01'
 
         db.session.add(user)
         db.session.commit()
@@ -853,9 +855,14 @@ class SignIn(Resource):
     @api.expect(parser4SignIn)
     def post(self):
         args = parser4SignIn.parse_args()
-        no_hp = args['no_hp']
+        basicAuth = args['Authorization']
 
-        if not no_hp:
+        base64Msg = basicAuth[6:]
+        msgBytes = base64Msg.encode('ascii')
+        base64Bytes = base64.b64decode(msgBytes)
+        no_hp = base64Bytes.decode('ascii')
+
+        if not base64Msg:
             return {
                 'message': 'Silahkan masukkan no HPnya dulu mom'
             }, 400
@@ -1052,7 +1059,7 @@ def handle_image(imageData):
 
                 # Make Detections
                 # result = tflite_inference(input=input_dict, model=model)
-                model = keras.models.load_model('./model/model_train_pose.h5')
+                model = keras.models.load_model('./model/saved_model.pb')
                 result = model.predict(input_dict)
                 result = result[0]
                 # print(result)
