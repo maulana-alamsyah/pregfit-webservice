@@ -1059,7 +1059,7 @@ def handle_image(imageData):
 
                 # Make Detections
                 # result = tflite_inference(input=input_dict, model=model)
-                model = keras.models.load_model('./model/saved_model.pb')
+                model = keras.models.load_model('./model/model_train_pose_new.h5')
                 result = model.predict(input_dict)
                 result = result[0]
                 # print(result)
