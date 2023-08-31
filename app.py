@@ -17,6 +17,7 @@ from tensorflow import keras
 import time
 import os
 import imghdr
+import re
 # from flask_sockets import Sockets
 # import eventlet
 # from eventlet import wsgi
@@ -874,6 +875,7 @@ class SignIn(Resource):
             payload = {
                 'user_id': user.id,
                 'no_hp': user.no_hp,
+                'trimester': int(re.search(r'\d+', user.usia_kandungan).group()),
                 'aud': AUDIENCE_MOBILE,
                 'iss': ISSUER,
                 'iat': datetime.utcnow(),
