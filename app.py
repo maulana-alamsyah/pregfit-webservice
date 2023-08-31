@@ -1068,21 +1068,18 @@ def handle_image(imageData):
                 body_language_prob = result[np.argmax(result)]
                 # print('asd')
 
-                # 0: bird-dog-pose, 1: cat-cow-pose, 2: child-pose, 3: glute-bridge, 4: lateral-leg-raise, 5: side-bend, 6: sideclamp , 7: savasana
-                if str(body_language_class) == '0':
-                    pose_class = 'Bird Dog Pose'
-                elif str(body_language_class) == '1':
+                # 1: cat-cow-pose, 2: child-pose, 4: lateral-leg-raise, 5: side-bend, 6: sideclamp , 7: savasana
+
+                if str(body_language_class) == '1':
                     pose_class = 'Cat Cow Pose'
                 elif str(body_language_class) == '2':
                     pose_class = 'Child Pose'
-                elif str(body_language_class) == '3':
-                    pose_class = 'Glute Bridge Pose'
                 elif str(body_language_class) == '4':
-                    pose_class = 'Lateral Leg Raise Pose'
+                    pose_class = 'Lateral Leg Raise'
                 elif str(body_language_class) == '5':
-                    pose_class = 'Side Bend Pose'
+                    pose_class = 'Side Band'
                 elif str(body_language_class) == '6':
-                    pose_class = 'Side Clamp Pose'
+                    pose_class = 'Side Clamp'
                 elif str(body_language_class) == '7':
                     pose_class = 'Savasana Pose'
                 else:
