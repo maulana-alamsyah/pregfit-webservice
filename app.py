@@ -293,7 +293,7 @@ def clasify_video(cap, upload):
                         elif str(body_language_class) == '4':
                             pose_class = 'Lateral Leg Raise Pose'
                         elif str(body_language_class) == '5':
-                            pose_class = 'Side Band Pose'
+                            pose_class = 'Side Bend Pose'
                         elif str(body_language_class) == '6':
                             pose_class = 'Side Clamp Pose'
                         elif str(body_language_class) == '7':
@@ -1073,7 +1073,7 @@ def handle_image(imageData):
                 elif str(body_language_class) == '4':
                     pose_class = 'Lateral Leg Raise Pose'
                 elif str(body_language_class) == '5':
-                    pose_class = 'Side Band Pose'
+                    pose_class = 'Side Bend Pose'
                 elif str(body_language_class) == '6':
                     pose_class = 'Side Clamp Pose'
                 elif str(body_language_class) == '7':
