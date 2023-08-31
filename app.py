@@ -277,7 +277,7 @@ def clasify_video(cap, upload):
                         }
                         input_dict = {name: np.expand_dims(np.array(value, dtype=np.float32), axis=0) for name, value in dict_p12_to_p33.items()}
                         # Make Detections.
-                        model = keras.models.load_model('./model/model_train_pose.h5')
+                        model = keras.models.load_model('./model/model_new.h5')
                         result = model.predict(input_dict)
                         result = result[0]
                         body_language_class = np.argmax(result)
@@ -291,11 +291,11 @@ def clasify_video(cap, upload):
                         elif str(body_language_class) == '2':
                             pose_class = 'Child Pose'
                         elif str(body_language_class) == '4':
-                            pose_class = 'Lateral Leg Raise'
+                            pose_class = 'Lateral Leg Raise Pose'
                         elif str(body_language_class) == '5':
-                            pose_class = 'Side Band'
+                            pose_class = 'Side Band Pose'
                         elif str(body_language_class) == '6':
-                            pose_class = 'Side Clamp'
+                            pose_class = 'Side Clamp Pose'
                         elif str(body_language_class) == '7':
                             pose_class = 'Savasana Pose'
                         else:
@@ -1055,7 +1055,7 @@ def handle_image(imageData):
 
                 # Make Detections
                 # result = tflite_inference(input=input_dict, model=model)
-                model = keras.models.load_model('./model/model_train_pose_new.h5')
+                model = keras.models.load_model('./model/model_new.h5')
                 result = model.predict(input_dict)
                 result = result[0]
                 # print(result)
@@ -1071,11 +1071,11 @@ def handle_image(imageData):
                 elif str(body_language_class) == '2':
                     pose_class = 'Child Pose'
                 elif str(body_language_class) == '4':
-                    pose_class = 'Lateral Leg Raise'
+                    pose_class = 'Lateral Leg Raise Pose'
                 elif str(body_language_class) == '5':
-                    pose_class = 'Side Band'
+                    pose_class = 'Side Band Pose'
                 elif str(body_language_class) == '6':
-                    pose_class = 'Side Clamp'
+                    pose_class = 'Side Clamp Pose'
                 elif str(body_language_class) == '7':
                     pose_class = 'Savasana Pose'
                 else:
