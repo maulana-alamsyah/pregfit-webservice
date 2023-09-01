@@ -721,7 +721,8 @@ class C_No_Route(Resource):
         if no_hp.startswith("0"):
             no_hp = no_hp[1:]
         
-        user = db.session.execute(db.select(User).filter((User.no_hp == f'62{no_hp}') | (User.no_hp == no_hp)).first())
+        result = db.session.execute(db.select(User).filter((User.no_hp == f'62{no_hp}') | (User.no_hp == no_hp)))
+        user = result.fetchone()
         if user:
             return {
                 'message': 'Nomor HP sudah digunakan, silahkan langsung masuk aja mom!'
@@ -869,7 +870,8 @@ class SignIn(Resource):
                 'message': 'Silahkan masukkan no HPnya dulu mom'
             }, 400
         
-        user = db.session.execute(db.select(User).filter((User.no_hp == f'62{no_hp}') | (User.no_hp == no_hp)).first())
+        result = db.session.execute(db.select(User).filter((User.no_hp == f'62{no_hp}') | (User.no_hp == no_hp)))
+        user = result.fetchone()
         if not user:
             return {
                 'message': 'No HP mom belum terdaftar di Preg-Fit, mom bisa daftar dulu'
