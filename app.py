@@ -757,6 +757,8 @@ class User_Route(Resource):
     def post(self):
         args = parser4SignUp.parse_args()
         no_hp = args['no_hp']
+        if no_hp.startswith("0"):
+            no_hp = f'62{no_hp[1:]}'
         
         user = db.session.execute(db.select(User).filter_by(no_hp=no_hp)).first()
         if user:
