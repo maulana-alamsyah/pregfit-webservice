@@ -717,8 +717,14 @@ class C_No_Route(Resource):
     def post(self):
         args = parser4SignUp.parse_args()
         no_hp = args['no_hp']
+
+        if no_hp.startswith("0"):
+            no_hp = no_hp[1:]
         
-        user = db.session.execute(db.select(User).filter_by(no_hp=no_hp)).first()
+        user = db.session.execute(
+    db.select(User).filter(
+        (User.no_hp == f'62{input_no_hp}') | (User.no_hp == input_no_hp)
+    ).first())
         if user:
             return {
                 'message': 'Nomor HP sudah digunakan, silahkan langsung masuk aja mom!'
@@ -875,7 +881,6 @@ class SignIn(Resource):
             payload = {
                 'user_id': user.id,
                 'no_hp': user.no_hp,
-                'trimester': int(re.search(r'\d+', user.usia_kandungan).group()),
                 'aud': AUDIENCE_MOBILE,
                 'iss': ISSUER,
                 'iat': datetime.utcnow(),
