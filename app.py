@@ -424,7 +424,7 @@ class Feedback(db.Model):
     komentar = db.Column(db.String(255), nullable=False)
 
 
-SECRET_KEY = "WhatEverYouWant!"
+SECRET_KEY = "117732f96ab4693ccdfffafb291d46d255fb519a0660a7f8d5bef8c68e6808f4"
 ISSUER = "myFlaskWebService"
 AUDIENCE_MOBILE = "myMobileApp"
 
