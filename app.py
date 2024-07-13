@@ -13,7 +13,7 @@ import base64
 import cv2
 import numpy as np
 import mediapipe as mp
-from tensorflow import keras, nn, argmax
+from tensorflow as tf
 import time
 import os
 import imghdr
@@ -291,7 +291,7 @@ def clasify_video(cap, upload):
                         }
                         input_dict = {name: np.expand_dims(np.array(value, dtype=np.float32), axis=0) for name, value in dict_p12_to_p33.items()}
                         # Make Detections.
-                        model = keras.models.load_model('./model/model_new.h5')
+                        model = tf.keras.models.load_model('./model/model_new.h5')
                         result = model.predict(input_dict)
                         result = result[0]
                         body_language_class = np.argmax(result)
@@ -793,8 +793,8 @@ class C_No_Route(Resource):
 
 
         bert_predict = bert_load_model(input_text_tokenized)          # Lakukan prediksi
-        bert_output = nn.softmax(bert_predict[0], axis=-1)         # Softmax function untuk mendapatkan hasil klasifikasi
-        output = argmax(bert_output, axis=1)
+        bert_output = tf.nn.softmax(bert_predict[0], axis=-1)         # Softmax function untuk mendapatkan hasil klasifikasi
+        output = tf.argmax(bert_output, axis=1)
 
 
         # Menemukan respon sesuai data tag dan memainkan voice bot
@@ -1166,7 +1166,7 @@ def handle_image(imageData):
 
                 # Make Detections
                 # result = tflite_inference(input=input_dict, model=model)
-                model = keras.models.load_model('./model/model_new.h5')
+                model = tf.keras.models.load_model('./model/model_new.h5')
                 result = model.predict(input_dict)
                 result = result[0]
                 # print(result)
