@@ -24,6 +24,8 @@ from random import choice as random_choice
 from sklearn.preprocessing import LabelEncoder
 from transformers import BertTokenizer, TFBertForSequenceClassification
 import json
+
+from dotenv import load_dotenv
 # from flask_sockets import Sockets
 # import eventlet
 # from eventlet import wsgi
