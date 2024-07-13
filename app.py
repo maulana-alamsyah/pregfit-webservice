@@ -769,7 +769,7 @@ class C_No_Route(Resource):
 
 
         labelencoder = LabelEncoder()
-        data['tags'] = labelencoder.fit_transform(data['tags'])
+        # data['tags'] = labelencoder.fit_transform(data['tags'])
 
 
         PRE_TRAINED_MODEL = 'indobenchmark/indobert-base-p2'
