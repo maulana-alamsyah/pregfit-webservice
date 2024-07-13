@@ -19,6 +19,7 @@ import os
 import imghdr
 import re
 
+import pandas as pd
 import nltk
 from random import choice as random_choice
 from sklearn.preprocessing import LabelEncoder
@@ -768,8 +769,9 @@ class C_No_Route(Resource):
                             classes.append(intent['tag'])
 
 
+        data = pd.DataFrame({"patterns":inputs, "tags":tags})
         labelencoder = LabelEncoder()
-        # data['tags'] = labelencoder.fit_transform(data['tags'])
+        data['tags'] = labelencoder.fit_transform(data['tags'])
 
 
         PRE_TRAINED_MODEL = 'indobenchmark/indobert-base-p2'
