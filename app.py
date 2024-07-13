@@ -36,6 +36,7 @@ app = Flask(__name__)
 socketio = SocketIO(app,async_mode=None)
 # sockets = Sockets(app)
 # socketio = SocketIO(app, cors_allowed_origins='*')
+load_dotenv()
 CORS(app)
 UPLOAD_FOLDER = './uploads/'
 TEMP_FOLDER = './temp/'
