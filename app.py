@@ -13,7 +13,7 @@ import base64
 import cv2
 import numpy as np
 import mediapipe as mp
-from tensorflow import keras
+from tensorflow import keras, nn, argmax
 import time
 import os
 import imghdr
@@ -23,6 +23,7 @@ import nltk
 from random import choice as random_choice
 from sklearn.preprocessing import LabelEncoder
 from transformers import BertTokenizer, TFBertForSequenceClassification
+import json
 # from flask_sockets import Sockets
 # import eventlet
 # from eventlet import wsgi
@@ -783,8 +784,8 @@ class C_No_Route(Resource):
 
 
         bert_predict = bert_load_model(input_text_tokenized)          # Lakukan prediksi
-        bert_output = tf.nn.softmax(bert_predict[0], axis=-1)         # Softmax function untuk mendapatkan hasil klasifikasi
-        output = tf.argmax(bert_output, axis=1)
+        bert_output = nn.softmax(bert_predict[0], axis=-1)         # Softmax function untuk mendapatkan hasil klasifikasi
+        output = argmax(bert_output, axis=1)
 
 
         # Menemukan respon sesuai data tag dan memainkan voice bot
