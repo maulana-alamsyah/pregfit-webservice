@@ -777,7 +777,11 @@ class C_No_Route(Resource):
         bert_tokenizer = BertTokenizer.from_pretrained(PRE_TRAINED_MODEL, force_download=True)
 
         bert_load_model = TFBertForSequenceClassification.from_pretrained(PRE_TRAINED_MODEL, num_labels=6)
-        bert_load_model.load_weights('./model/bert-model.h5')
+        try:
+            bert_load_model.load_weights('./model/bert-model.h5')
+            print("Model weights loaded successfully.")
+        except Exception as e:
+            print(f"Error loading model weights: {e}")
 
         input_text_tokenized = bert_tokenizer.encode(message,
                                               truncation=True,
