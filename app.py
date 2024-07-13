@@ -748,17 +748,17 @@ class C_No_Route(Resource):
             ignore_words = ['?', '!'] # Mengabaikan tanda spesial karakter
 
             for intent in data1['intents']:
-            responses[intent['tag']]=intent['responses']
-            for lines in intent['patterns']:
-                inputs.append(lines)
-                tags.append(intent['tag'])
-                for pattern in intent['patterns']:
-                w = nltk.word_tokenize(pattern)
-                words.extend(w)
-                documents.append((w, intent['tag']))
-                # add to our classes list
-                if intent['tag'] not in classes:
-                    classes.append(intent['tag'])
+                responses[intent['tag']]=intent['responses']
+                for lines in intent['patterns']:
+                    inputs.append(lines)
+                    tags.append(intent['tag'])
+                    for pattern in intent['patterns']:
+                        w = nltk.word_tokenize(pattern)
+                        words.extend(w)
+                        documents.append((w, intent['tag']))
+                        # add to our classes list
+                        if intent['tag'] not in classes:
+                            classes.append(intent['tag'])
 
 
         labelencoder = LabelEncoder()
