@@ -38,6 +38,9 @@ socketio = SocketIO(app,async_mode=None)
 CORS(app)
 UPLOAD_FOLDER = './uploads/'
 TEMP_FOLDER = './temp/'
+SQL_USERNAME = os.getenv('SQL_USERNAME')
+SQL_PASSWORD = os.getenv('SQL_PASSWORD')
+SQL_DB = os.getenv('SQL_DB')
 ALLOWED_EXTENSIONS = {'mp4', 'avi'}
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -78,7 +81,7 @@ api = Api(
 
 
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://root:@127.0.0.1:3306/pregfit_webservice"
+app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql://{SQL_USERNAME}:{SQL_PASSWORD}@127.0.0.1:3306/{SQL_DB}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ECHO"] = True
 
