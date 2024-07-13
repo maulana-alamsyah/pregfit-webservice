@@ -13,7 +13,7 @@ import base64
 import cv2
 import numpy as np
 import mediapipe as mp
-from tensorflow as tf
+import tensorflow as tf
 import time
 import os
 import imghdr
