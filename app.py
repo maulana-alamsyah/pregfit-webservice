@@ -741,7 +741,7 @@ class C_No_Route(Resource):
         bert_output = tf.nn.softmax(bert_predict[0], axis=-1)         # Softmax function untuk mendapatkan hasil klasifikasi
         output = tf.argmax(bert_output, axis=1)
 
-        response_tag = labelencoder.inverse_transform([output])[0]
+        response_tag = labelencoder.inverse_transform(output.numpy().flatten())[0]
         response = random.choice(responses[response_tag])
 
         if response:
