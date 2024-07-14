@@ -21,7 +21,7 @@ import re
 
 import pandas as pd
 import nltk
-from random import choice as random_choice
+import random
 from sklearn.preprocessing import LabelEncoder
 from transformers import BertTokenizer, TFBertForSequenceClassification
 import json
@@ -734,73 +734,17 @@ class C_No_Route(Resource):
         args = parser4ChatBot.parse_args()
         message = args['message']
 
-        
-        # Package sentence tokenizer
-        nltk.download('punkt') 
-        # Package lemmatization
-        nltk.download('wordnet')
-        # Package multilingual wordnet data
-        nltk.download('omw-1.4')
-
-
-        with open('./dataset/datasets.json') as content:
-            data1 = json.load(content)
-
-            # Mendapatkan semua data ke dalam list
-            tags = [] # data tag
-            inputs = [] # data input atau pattern
-            responses = {} # data respon
-            words = [] # Data kata 
-            classes = [] # Data Kelas atau Tag
-            documents = [] # Data Kalimat Dokumen
-            ignore_words = ['?', '!'] # Mengabaikan tanda spesial karakter
-
-            for intent in data1['intents']:
-                responses[intent['tag']]=intent['responses']
-                for lines in intent['patterns']:
-                    inputs.append(lines)
-                    tags.append(intent['tag'])
-                    for pattern in intent['patterns']:
-                        w = nltk.word_tokenize(pattern)
-                        words.extend(w)
-                        documents.append((w, intent['tag']))
-                        # add to our classes list
-                        if intent['tag'] not in classes:
-                            classes.append(intent['tag'])
-
-
-        data = pd.DataFrame({"patterns":inputs, "tags":tags})
-        labelencoder = LabelEncoder()
-        data['tags'] = labelencoder.fit_transform(data['tags'])
-
-
-        PRE_TRAINED_MODEL = 'indobenchmark/indobert-base-p2'
-
-        bert_tokenizer = BertTokenizer.from_pretrained(PRE_TRAINED_MODEL, force_download=True)
-
-        bert_load_model = TFBertForSequenceClassification.from_pretrained(PRE_TRAINED_MODEL, num_labels=6)
-        try:
-            bert_load_model.load_weights('./model/bert-model.h5')
-            print("Model weights loaded successfully.")
-        except Exception as e:
-            print(f"Error loading model weights: {e}")
-
         input_text_tokenized = bert_tokenizer.encode(message,
-                                              truncation=True,
-                                              padding='max_length',
-                                               max_length = 20,
-                                              return_tensors='tf')
-
-
+                                                truncation=True,
+                                                padding='max_length',
+                                                return_tensors='tf')
+    
         bert_predict = bert_load_model(input_text_tokenized)          # Lakukan prediksi
-        bert_output = tf.nn.softmax(bert_predict[0], axis=-1)         # Softmax function untuk mendapatkan hasil klasifikasi
-        output = tf.argmax(bert_output, axis=1)
+        bert_predict = tf.nn.softmax(bert_predict[0], axis=-1)         # Softmax function untuk mendapatkan hasil klasifikasi
+        output = tf.argmax(bert_predict, axis=1)
 
-
-        # Menemukan respon sesuai data tag dan memainkan voice bot
-        response_tag = labelencoder.inverse_transform(output.numpy().flatten())[0]
-
-        response = random_choice(responses[response_tag])
+        response_tag = le.inverse_transform([output])[0]
+        response = random.choice(responses[response_tag])
 
         if response:
             return response, 200
@@ -1281,6 +1225,17 @@ def handle_image(imageData):
 application = app.wsgi_app     
 
 if __name__ == '__main__':
+    #Pretrained Model
+    PRE_TRAINED_MODEL = 'indobenchmark/indobert-base-p2'
+
+    #Load tokenizer dari pretrained model
+    bert_tokenizer = BertTokenizer.from_pretrained(PRE_TRAINED_MODEL)
+
+    # Load hasil fine-tuning
+    bert_load_model = TFBertForSequenceClassification.from_pretrained(PRE_TRAINED_MODEL, num_labels=62)
+
+    #Load Model
+    bert_load_model.load_weights('model/bert-model.h5')
     # wsgi_server = eventlet.listen(('0.0.0.0', 5000))
 
     # # Load the SSL/TLS certificate and key files
