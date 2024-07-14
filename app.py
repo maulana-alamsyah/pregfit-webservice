@@ -771,6 +771,7 @@ class C_No_Route(Resource):
                                                max_length = 20,
                                               return_tensors='tf')
 
+        bert_predict = bert_load_model(input_text_tokenized) 
         bert_output = tf.nn.softmax(bert_predict[0], axis=-1)         # Softmax function untuk mendapatkan hasil klasifikasi
         output = tf.argmax(bert_output, axis=1)
         response_tag = labelencoder.inverse_transform(output.numpy().flatten())[0]
