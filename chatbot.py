@@ -1,6 +1,5 @@
 import json
 import random
-import pickle
 import pandas as pd
 import regex as re
 from sklearn.preprocessing import LabelEncoder
