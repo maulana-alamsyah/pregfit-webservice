@@ -19,12 +19,7 @@ import os
 import imghdr
 import re
 
-import pandas as pd
-import nltk
-import random
-from sklearn.preprocessing import LabelEncoder
-from transformers import BertTokenizer, TFBertForSequenceClassification
-import json
+import chatbot
 
 from dotenv import load_dotenv
 # from flask_sockets import Sockets
@@ -733,38 +728,7 @@ class C_No_Route(Resource):
     def post(self):
         args = parser4ChatBot.parse_args()
         message = args['message']
-
-        # Package sentence tokenizer
-        nltk.download('punkt') 
-        # Package lemmatization
-        nltk.download('wordnet')
-        # Package multilingual wordnet data
-        nltk.download('omw-1.4')
-        with open('./dataset/datasets.json') as content:
-            data1 = json.load(content)
-            # Mendapatkan semua data ke dalam list
-            tags = [] # data tag
-            inputs = [] # data input atau pattern
-            responses = {} # data respon
-            words = [] # Data kata 
-            classes = [] # Data Kelas atau Tag
-            documents = [] # Data Kalimat Dokumen
-            ignore_words = ['?', '!'] # Mengabaikan tanda spesial karakter
-            for intent in data1['intents']:
-                responses[intent['tag']]=intent['responses']
-                for lines in intent['patterns']:
-                    inputs.append(lines)
-                    tags.append(intent['tag'])
-                    for pattern in intent['patterns']:
-                        w = nltk.word_tokenize(pattern)
-                        words.extend(w)
-                        documents.append((w, intent['tag']))
-                        # add to our classes list
-                        if intent['tag'] not in classes:
-                            classes.append(intent['tag'])
-        data = pd.DataFrame({"patterns":inputs, "tags":tags})
-        labelencoder = LabelEncoder()
-        data['tags'] = labelencoder.fit_transform(data['tags'])
+        
         input_text_tokenized = bert_tokenizer.encode(message,
                                               truncation=True,
                                               padding='max_length',
@@ -774,7 +738,8 @@ class C_No_Route(Resource):
         bert_predict = bert_load_model(input_text_tokenized) 
         bert_output = tf.nn.softmax(bert_predict[0], axis=-1)         # Softmax function untuk mendapatkan hasil klasifikasi
         output = tf.argmax(bert_output, axis=1)
-        response_tag = labelencoder.inverse_transform(output.numpy().flatten())[0]
+
+        response_tag = labelencoder.inverse_transform([output])[0]
         response = random.choice(responses[response_tag])
 
         if response:
@@ -1256,6 +1221,13 @@ def handle_image(imageData):
 application = app.wsgi_app     
 
 if __name__ == '__main__':
+    # Package sentence tokenizer
+    nltk.download('punkt') 
+    # Package lemmatization
+    nltk.download('wordnet')
+    # Package multilingual wordnet data
+    nltk.download('omw-1.4')
+    
     #Pretrained Model
     PRE_TRAINED_MODEL = 'indobenchmark/indobert-base-p2'
 
