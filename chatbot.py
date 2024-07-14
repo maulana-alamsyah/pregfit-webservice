@@ -4,6 +4,7 @@ import pickle
 import pandas as pd
 import regex as re
 from sklearn.preprocessing import LabelEncoder
+import nltk
 
 
 # Package sentence tokenizer
