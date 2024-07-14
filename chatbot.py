@@ -44,7 +44,7 @@ for intent in data1['intents']:
 data = pd.DataFrame({"patterns":inputs, "tags":tags})
 
 labelencoder = LabelEncoder()
-data['tags'] = labelencoder.fit_transform(data['tags'])
+data['tags'] = labelencoder.fit_transform(data['tags']).values.ravel()
 
 def text_preprocessing(text):
   text = text.lower()                               # Mengubah teks menjadi lower case
