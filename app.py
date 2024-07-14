@@ -20,6 +20,8 @@ import imghdr
 import re
 
 import chatbot
+from transformers import BertTokenizer, TFBertForSequenceClassification
+import random
 
 from dotenv import load_dotenv
 # from flask_sockets import Sockets
