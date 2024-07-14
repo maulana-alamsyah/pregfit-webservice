@@ -43,8 +43,8 @@ for intent in data1['intents']:
 # Konversi data json ke dalam dataframe
 data = pd.DataFrame({"patterns":inputs, "tags":tags})
 
-le = LabelEncoder()
-data['tags'] = le.fit_transform(data['tags'])
+labelencoder = LabelEncoder()
+data['tags'] = labelencoder.fit_transform(data['tags'])
 
 def text_preprocessing(text):
   text = text.lower()                               # Mengubah teks menjadi lower case
