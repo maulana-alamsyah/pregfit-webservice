@@ -1221,13 +1221,6 @@ def handle_image(imageData):
 application = app.wsgi_app     
 
 if __name__ == '__main__':
-    # Package sentence tokenizer
-    nltk.download('punkt') 
-    # Package lemmatization
-    nltk.download('wordnet')
-    # Package multilingual wordnet data
-    nltk.download('omw-1.4')
-    
     #Pretrained Model
     PRE_TRAINED_MODEL = 'indobenchmark/indobert-base-p2'
 
