@@ -19,7 +19,7 @@ import os
 import imghdr
 import re
 
-import chatbot
+from chatbot import *
 from transformers import BertTokenizer, TFBertForSequenceClassification
 import random
 
