@@ -46,8 +46,6 @@ data = pd.DataFrame({"patterns":inputs, "tags":tags})
 labelencoder = LabelEncoder()
 data['tags'] = labelencoder.fit_transform(data['tags'])
 
-print(data['tags'])
-
 def text_preprocessing(text):
   text = text.lower()                               # Mengubah teks menjadi lower case
   text = re.sub(r'https?://\S+|www\.\S+', '', text) # Menghapus URL
