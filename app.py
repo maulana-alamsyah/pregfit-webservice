@@ -835,15 +835,15 @@ class Verif_OTP_Route(Resource):
         otp = args['otp']
 
         verification_check = client.verify.v2.services(twilio_services).verification_checks.create(to=no_hp, code=otp)
-        return verification_check.status
-        # if verification_check.status.valid:
-        #     return {
-        #         'message': 'OTP valid mom!'
-        #     }, 200
+        
+        if verification_check.valid and verification_check.status != "pending":
+            return {
+                'message': 'OTP valid mom!'
+            }, 200
 
-        # return {
-        #     'message' : 'OTP tidak valid mom!'
-        # }, 400  
+        return {
+            'message' : 'OTP tidak valid mom!'
+        }, 400  
 
 @api.route('/check_email')
 class C_Email_Route(Resource):
