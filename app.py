@@ -26,6 +26,7 @@ import random
 from dotenv import load_dotenv
 
 from twilio.rest import Client
+from twilio.base.exceptions import TwilioRestException
 # from flask_sockets import Sockets
 # import eventlet
 # from eventlet import wsgi
@@ -847,7 +848,6 @@ class Verif_OTP_Route(Resource):
                         return {
                             'message': 'No HP mom belum terdaftar di Preg-Fit, mom bisa daftar dulu'
                         }, 400
-
                     else:
                         user = user[0]
                         payload = {
@@ -858,9 +858,7 @@ class Verif_OTP_Route(Resource):
                             'iat': datetime.utcnow(),
                             'exp': datetime.utcnow() + timedelta(hours=5)
                         }
-
                         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-
                         return {
                             'token': token
                         }, 200
@@ -870,7 +868,7 @@ class Verif_OTP_Route(Resource):
                         return {
                             'message': 'Nomor HP sudah digunakan, silahkan langsung masuk aja mom!'
                         }, 409
-                    
+                        
                     user = User()
                     user.no_hp = no_hp
                     user.tanggal_lahir = '1999-01-01'
@@ -890,14 +888,12 @@ class Verif_OTP_Route(Resource):
                         'iat': datetime.utcnow(),
                         'exp': datetime.utcnow() + timedelta(hours=5)
                     }
-
                     token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
                     return {
                         'token': token,
                         'message' : 'Berhasil daftar mom'
                     }, 201
-
             return {
                 'message' : 'OTP tidak valid mom!'
             }, 400
@@ -914,7 +910,10 @@ class Verif_OTP_Route(Resource):
                     'message' : 'Terlalu banyak salah silahkan coba beberapa saat lagi mom!'
                 }, 400
             else:
-                print(f"Twilio error: {e.code} - {e.msg}")  
+                print(f"Twilio error: {e.code} - {e.msg}")
+                return {
+                    'message' : 'Terjadi kesalahan pada sistem. Silahkan coba lagi nanti.'
+                }, 500
 
 @api.route('/check_email')
 class C_Email_Route(Resource):
