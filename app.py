@@ -466,9 +466,9 @@ AUDIENCE_MOBILE = "myMobileApp"
 parser4OTPsend = reqparse.RequestParser()
 parser4OTPsend.add_argument('no_hp', type=str, location='json', required=True, help='Nomor HP')
 
-parser4OTPsverif = reqparse.RequestParser()
-parser4OTPsverif.add_argument('no_hp', type=str, location='json', required=True, help='Nomor HP')
-parser4OTPsverif.add_argument('otp', type=str, location='json', required=True, help='OTP')
+parser4OTPverif = reqparse.RequestParser()
+parser4OTPverif.add_argument('no_hp', type=str, location='json', required=True, help='Nomor HP')
+parser4OTPverif.add_argument('otp', type=str, location='json', required=True, help='OTP')
 
 parser4ChatBot = reqparse.RequestParser()
 parser4ChatBot.add_argument('message', type=str, location='json', required=True, help='Message')
@@ -824,6 +824,26 @@ class Send_OTP_Route(Resource):
         return {
             'message' : 'Gagal kirim OTP mom!'
         }, 500  
+
+@api.route('/verif_otp')
+class Verif_OTP_Route(Resource):
+    @api.expect(parser4OTPverif)
+    @api.response(200, 'OK')
+    def post(self):
+        args = parser4OTPverif.parse_args()
+        no_hp = format_phone_number(args['no_hp'])
+        otp = args['otp']
+
+        verification_check = client.verify.v2.services(twilio_services).verification_checks.create(to=no_hp, code=otp)
+        
+        if verification_check.status.valid:
+            return {
+                'message': 'OTP valid mom!'
+            }, 200
+
+        return {
+            'message' : 'OTP tidak valid mom!'
+        }, 400  
 
 @api.route('/check_email')
 class C_Email_Route(Resource):
