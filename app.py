@@ -24,6 +24,8 @@ from transformers import BertTokenizer, TFBertForSequenceClassification
 import random
 
 from dotenv import load_dotenv
+
+from twilio.rest import Client
 # from flask_sockets import Sockets
 # import eventlet
 # from eventlet import wsgi
@@ -43,6 +45,10 @@ TEMP_FOLDER = './temp/'
 SQL_USERNAME = os.getenv('SQL_USERNAME')
 SQL_PASSWORD = os.getenv('SQL_PASSWORD')
 SQL_DB = os.getenv('SQL_DB')
+twilio_account_sid = os.getenv('TWILIO_SID')
+twilio_auth_token = os.getenv('TWILIO_TOKEN')
+twilio_services = os.getenv('TWILIO_SERVICES')
+client = Client(account_sid, auth_token)
 ALLOWED_EXTENSIONS = {'mp4', 'avi'}
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -413,6 +419,24 @@ def is_token_valid(token):
     except jwt.InvalidTokenError:
         return False
 
+def format_phone_number(no_hp):
+    # Remove non-digit characters except for '+'
+    no_hp = re.sub(r'[^\d+]', '', no_hp)
+    
+    # If the number already has a '+' prefix, return it as is
+    if no_hp.startswith('+'):
+        return no_hp
+    
+    # Handle different formats
+    if no_hp.startswith('62'):
+        return "+62" + no_hp[2:]
+    elif no_hp.startswith('0'):
+        return "+62" + no_hp[1:]
+    elif no_hp.startswith('8'):
+        return "+62" + no_hp
+    else:
+        return "+62" + no_hp
+
 class User(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     no_hp = db.Column(db.String(13), unique=True, nullable=True)
@@ -438,6 +462,13 @@ SECRET_KEY = "117732f96ab4693ccdfffafb291d46d255fb519a0660a7f8d5bef8c68e6808f4"
 ISSUER = "myFlaskWebService"
 AUDIENCE_MOBILE = "myMobileApp"
 
+
+parser4OTPsend = reqparse.RequestParser()
+parser4OTPsend.add_argument('no_hp', type=str, location='json', required=True, help='Nomor HP')
+
+parser4OTPsverif = reqparse.RequestParser()
+parser4OTPsverif.add_argument('no_hp', type=str, location='json', required=True, help='Nomor HP')
+parser4OTPsverif.add_argument('otp', type=str, location='json', required=True, help='OTP')
 
 parser4ChatBot = reqparse.RequestParser()
 parser4ChatBot.add_argument('message', type=str, location='json', required=True, help='Message')
@@ -774,6 +805,25 @@ class C_No_Route(Resource):
         return {
             'message' : 'Nomor hp belum terdaftar'
         }, 200  
+
+@api.route('/send_otp')
+class C_No_Route(Resource):
+    @api.expect(parser4OTPsend)
+    @api.response(200, 'OK')
+    def post(self):
+        args = parser4OTPsend.parse_args()
+        no_hp = format_phone_number(args['no_hp'])
+
+        verification = client.verify.v2.services(twilio_services).verifications.create(to=no_hp, channel='sms')
+        
+        if verification.status == "pending":
+            return {
+                'message': 'OTP berhasil dikirim mom!'
+            }, 200
+
+        return {
+            'message' : 'Gagal kirim OTP mom!'
+        }, 500  
 
 @api.route('/check_email')
 class C_Email_Route(Resource):
