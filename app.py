@@ -894,7 +894,7 @@ class Verif_OTP_Route(Resource):
                     token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
                     return {
-                        'token': token
+                        'token': token,
                         'message' : 'Berhasil daftar mom'
                     }, 201
 
