@@ -868,7 +868,9 @@ class Verif_OTP_Route(Resource):
 def verif_otp(no_hp, otp):
     try:
         verification_check = client.verify.v2.services(twilio_services).verification_checks.create(to=no_hp, code=otp)
-        return verification_check.valid
+        if verification_check.valid:
+            return True, None
+        return False, 'OTP tidak valid mom!'
     except TwilioRestException as e:
         if e.code == 20404:
             print("Error: The requested resource was not found. Please check the Service SID.")
