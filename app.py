@@ -837,83 +837,61 @@ class Verif_OTP_Route(Resource):
         otp = args['otp']
         action = args['action']
 
-        try:
-            verification_check = client.verify.v2.services(twilio_services).verification_checks.create(to=no_hp, code=otp)
+        if action == 0:
+            user = db.session.execute(db.select(User).filter(User.no_hp == no_hp)).scalar()
+            if not user:
+                return {'message': 'No HP mom belum terdaftar di Preg-Fit, mom bisa daftar dulu'}, 400
+            
+            valid, error_message = verif_otp(no_hp, otp)
+            if valid:
+                token = generate_token(user)
+                return {'token': token}, 200
+            return {'message': error_message}, 400
 
-            if verification_check.valid:
-                if action == 0:
-                    result = db.session.execute(db.select(User).filter(User.no_hp == no_hp))
-                    user = result.fetchone()
-                    if not user:
-                        return {
-                            'message': 'No HP mom belum terdaftar di Preg-Fit, mom bisa daftar dulu'
-                        }, 400
-                    else:
-                        user = user[0]
-                        payload = {
-                            'user_id': user.id,
-                            'no_hp': user.no_hp,
-                            'aud': AUDIENCE_MOBILE,
-                            'iss': ISSUER,
-                            'iat': datetime.utcnow(),
-                            'exp': datetime.utcnow() + timedelta(hours=5)
-                        }
-                        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-                        return {
-                            'token': token
-                        }, 200
-                elif action == 1:
-                    user = db.session.execute(db.select(User).filter_by(no_hp=no_hp)).first()
-                    if user:
-                        return {
-                            'message': 'Nomor HP sudah digunakan, silahkan langsung masuk aja mom!'
-                        }, 409
-                        
-                    user = User()
-                    user.no_hp = no_hp
-                    user.tanggal_lahir = '1999-01-01'
+        elif action == 1:
+            user = db.session.execute(db.select(User).filter_by(no_hp=no_hp)).scalar()
+            if user:
+                return {'message': 'Nomor HP sudah digunakan, silahkan langsung masuk aja mom!'}, 409
 
-                    db.session.add(user)
-                    db.session.commit()
+            valid, error_message = verif_otp(no_hp, otp)
+            if valid:
+                new_user = User(no_hp=no_hp, tanggal_lahir='1999-01-01')
+                db.session.add(new_user)
+                db.session.commit()
 
-                    result = db.session.execute(db.select(User).filter(User.no_hp == no_hp))
-                    user = result.fetchone()
+                new_user = db.session.execute(db.select(User).filter(User.no_hp == no_hp)).scalar()
+                token = generate_token(new_user)
+                return {'token': token, 'message': 'Berhasil daftar mom'}, 201
 
-                    user = user[0]
-                    payload = {
-                        'user_id': user.id,
-                        'no_hp': user.no_hp,
-                        'aud': AUDIENCE_MOBILE,
-                        'iss': ISSUER,
-                        'iat': datetime.utcnow(),
-                        'exp': datetime.utcnow() + timedelta(hours=5)
-                    }
-                    token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+            return {'message': error_message}, 400
 
-                    return {
-                        'token': token,
-                        'message' : 'Berhasil daftar mom'
-                    }, 201
-            return {
-                'message' : 'OTP tidak valid mom!'
-            }, 400
+def verif_otp(no_hp, otp):
+    try:
+        verification_check = client.verify.v2.services(twilio_services).verification_checks.create(to=no_hp, code=otp)
+        return verification_check.valid
+    except TwilioRestException as e:
+        if e.code == 20404:
+            print("Error: The requested resource was not found. Please check the Service SID.")
+            return False, 'OTP tidak valid mom!'
+        elif e.code == 60202:
+            print("Error: Max check attempts reached. Please try again later.")
+            return False, 'Terlalu banyak salah silahkan coba beberapa saat lagi mom!'
+        else:
+            print(f"Twilio error: {e.code} - {e.msg}")
+            return False, 'Terjadi kesalahan pada sistem. Silahkan coba lagi nanti.'
 
-        except TwilioRestException as e:
-            if e.code == 20404:
-                print("Error: The requested resource was not found. Please check the Service SID.")
-                return {
-                    'message' : 'OTP tidak valid mom!'
-                }, 400
-            elif e.code == 60202:
-                print("Error: Max check attempts reached. Please try again later.")
-                return {
-                    'message' : 'Terlalu banyak salah silahkan coba beberapa saat lagi mom!'
-                }, 400
-            else:
-                print(f"Twilio error: {e.code} - {e.msg}")
-                return {
-                    'message' : 'Terjadi kesalahan pada sistem. Silahkan coba lagi nanti.'
-                }, 500
+def generate_token(user):
+    payload = {
+        'user_id': user.id,
+        'no_hp': user.no_hp,
+        'aud': AUDIENCE_MOBILE,
+        'iss': ISSUER,
+        'iat': datetime.utcnow(),
+        'exp': datetime.utcnow() + timedelta(hours=5)
+    }
+    token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+    return token
+
 
 @api.route('/check_email')
 class C_Email_Route(Resource):
