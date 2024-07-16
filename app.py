@@ -755,7 +755,7 @@ class Popular_Route(Resource):
 
 
 @api.route('/chatbot')
-class C_No_Route(Resource):
+class Chatbot_Route(Resource):
     @api.expect(parser4ChatBot)
     @api.response(200, 'OK')
     def post(self):
@@ -785,7 +785,7 @@ class C_No_Route(Resource):
 
 
 @api.route('/check_no')
-class C_No_Route(Resource):
+class Check_No_Route(Resource):
     @api.expect(parser4SignUp)
     @api.response(200, 'OK')
     def post(self):
@@ -807,7 +807,7 @@ class C_No_Route(Resource):
         }, 200  
 
 @api.route('/send_otp')
-class C_No_Route(Resource):
+class Send_OTP_Route(Resource):
     @api.expect(parser4OTPsend)
     @api.response(200, 'OK')
     def post(self):
