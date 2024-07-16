@@ -469,6 +469,7 @@ parser4OTPsend.add_argument('no_hp', type=str, location='json', required=True, h
 parser4OTPverif = reqparse.RequestParser()
 parser4OTPverif.add_argument('no_hp', type=str, location='json', required=True, help='Nomor HP')
 parser4OTPverif.add_argument('otp', type=str, location='json', required=True, help='OTP')
+parser4OTPverif.add_argument('action', type=str, location='json', required=True, help='Aksi')
 
 parser4ChatBot = reqparse.RequestParser()
 parser4ChatBot.add_argument('message', type=str, location='json', required=True, help='Message')
@@ -833,17 +834,87 @@ class Verif_OTP_Route(Resource):
         args = parser4OTPverif.parse_args()
         no_hp = format_phone_number(args['no_hp'])
         otp = args['otp']
+        action = args['action']
 
-        verification_check = client.verify.v2.services(twilio_services).verification_checks.create(to=no_hp, code=otp)
+        try:
+            verification_check = client.verify.v2.services(twilio_services).verification_checks.create(to=no_hp, code=otp)
 
-        if verification_check.valid:
+            if verification_check.valid:
+                if action == 0:
+                    result = db.session.execute(db.select(User).filter(User.no_hp == no_hp))
+                    user = result.fetchone()
+                    if not user:
+                        return {
+                            'message': 'No HP mom belum terdaftar di Preg-Fit, mom bisa daftar dulu'
+                        }, 400
+
+                    else:
+                        user = user[0]
+                        payload = {
+                            'user_id': user.id,
+                            'no_hp': user.no_hp,
+                            'aud': AUDIENCE_MOBILE,
+                            'iss': ISSUER,
+                            'iat': datetime.utcnow(),
+                            'exp': datetime.utcnow() + timedelta(hours=5)
+                        }
+
+                        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+
+                        return {
+                            'token': token
+                        }, 200
+                elif action == 1:
+                    user = db.session.execute(db.select(User).filter_by(no_hp=no_hp)).first()
+                    if user:
+                        return {
+                            'message': 'Nomor HP sudah digunakan, silahkan langsung masuk aja mom!'
+                        }, 409
+                    
+                    user = User()
+                    user.no_hp = no_hp
+                    user.tanggal_lahir = '1999-01-01'
+
+                    db.session.add(user)
+                    db.session.commit()
+
+                    result = db.session.execute(db.select(User).filter(User.no_hp == no_hp))
+                    user = result.fetchone()
+
+                    user = user[0]
+                    payload = {
+                        'user_id': user.id,
+                        'no_hp': user.no_hp,
+                        'aud': AUDIENCE_MOBILE,
+                        'iss': ISSUER,
+                        'iat': datetime.utcnow(),
+                        'exp': datetime.utcnow() + timedelta(hours=5)
+                    }
+
+                    token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+
+                    return {
+                        'token': token
+                        'message' : 'Berhasil daftar mom'
+                    }, 201
+
             return {
-                'message': 'OTP valid mom!'
-            }, 200
+                'message' : 'OTP tidak valid mom!'
+            }, 400
 
-        return {
-            'message' : 'OTP tidak valid mom!'
-        }, 400  
+        except TwilioRestException as e:
+            if e.code == 20404:
+                print("Error: The requested resource was not found. Please check the Service SID.")
+                return {
+                    'message' : 'OTP tidak valid mom!'
+                }, 400
+            elif e.code == 60202:
+                print("Error: Max check attempts reached. Please try again later.")
+                return {
+                    'message' : 'Terlalu banyak salah silahkan coba beberapa saat lagi mom!'
+                }, 400
+            else:
+                print(f"Twilio error: {e.code} - {e.msg}")  
 
 @api.route('/check_email')
 class C_Email_Route(Resource):
