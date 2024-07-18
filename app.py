@@ -49,6 +49,9 @@ SQL_DB = os.getenv('SQL_DB')
 twilio_account_sid = os.getenv('TWILIO_SID')
 twilio_auth_token = os.getenv('TWILIO_TOKEN')
 twilio_services = os.getenv('TWILIO_SERVICES')
+SECRET_KEY = os.getenv('APP_SECRET_KEY')
+ISSUER = "myFlaskWebService"
+AUDIENCE_MOBILE = "myMobileApp"
 client = Client(twilio_account_sid, twilio_auth_token)
 ALLOWED_EXTENSIONS = {'mp4', 'avi'}
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
@@ -459,11 +462,6 @@ class Feedback(db.Model):
     komentar = db.Column(db.String(255), nullable=False)
 
 
-SECRET_KEY = "117732f96ab4693ccdfffafb291d46d255fb519a0660a7f8d5bef8c68e6808f4"
-ISSUER = "myFlaskWebService"
-AUDIENCE_MOBILE = "myMobileApp"
-
-
 parser4OTPsend = reqparse.RequestParser()
 parser4OTPsend.add_argument('no_hp', type=str, location='json', required=True, help='Nomor HP')
 
@@ -471,6 +469,7 @@ parser4OTPverif = reqparse.RequestParser()
 parser4OTPverif.add_argument('no_hp', type=str, location='json', required=True, help='Nomor HP')
 parser4OTPverif.add_argument('otp', type=str, location='json', required=True, help='OTP')
 parser4OTPverif.add_argument('action', type=int, location='json', required=True, help='Aksi')
+parser4OTPverif.add_argument('email', type=str, location='json', required=False, help='Email')
 
 parser4ChatBot = reqparse.RequestParser()
 parser4ChatBot.add_argument('message', type=str, location='json', required=True, help='Message')
@@ -836,6 +835,7 @@ class Verif_OTP_Route(Resource):
         no_hp = format_phone_number(args['no_hp'])
         otp = args['otp']
         action = args['action']
+        email = args.get('email')
 
         if action == 0:
             user = db.session.execute(db.select(User).filter(User.no_hp == no_hp)).scalar()
@@ -862,6 +862,22 @@ class Verif_OTP_Route(Resource):
                 new_user = db.session.execute(db.select(User).filter(User.no_hp == no_hp)).scalar()
                 token = generate_token(new_user)
                 return {'token': token, 'message': 'Berhasil daftar mom'}, 201
+
+            return {'message': error_message}, 400
+        
+        elif action == 2:
+            user = db.session.execute(db.select(User).filter(User.no_hp == no_hp)).scalar()
+            if user:
+                return {'message': 'Nomor HP sudah digunakan, silahkan coba nomor lain!'}, 409
+
+            valid, error_message = verif_otp(no_hp, otp)
+            if valid:
+                current_user = db.session.execute(db.select(User).filter_by(email=email)).scalar()
+                current_user.no_hp = no_hp
+                db.session.commit()
+
+                token = generate_token(current_user)
+                return {'token': token, 'message': 'No HP berhasil diubah'}, 200
 
             return {'message': error_message}, 400
 
