@@ -5,7 +5,6 @@ from sqlalchemy import func
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.datastructures import FileStorage
 from datetime  import date, datetime, timedelta
-from dateutil.relativedelta import relativedelta
 import jwt
 from json import dumps
 from flask_cors import CORS
@@ -900,15 +899,13 @@ def verif_otp(no_hp, otp):
             return False, 'Terjadi kesalahan pada sistem. Silahkan coba lagi nanti.'
 
 def generate_token(user):
-    current_datetime = datetime.utcnow()
-    exp_datetime = current_datetime + relativedelta(months=1)
     payload = {
         'user_id': user.id,
         'no_hp': user.no_hp,
         'aud': AUDIENCE_MOBILE,
         'iss': ISSUER,
         'iat': datetime.utcnow(),
-        'exp': exp_datetime.isoformat()
+        'exp': datetime.utcnow() + timedelta(hours=24)
     }
     token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
     return token
