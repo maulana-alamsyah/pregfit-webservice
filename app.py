@@ -31,8 +31,6 @@ app = Flask(__name__)
 socketio = SocketIO(app,async_mode=None)
 load_dotenv()
 CORS(app)
-UPLOAD_FOLDER = './uploads/'
-TEMP_FOLDER = './temp/'
 SQL_USERNAME = os.getenv('SQL_USERNAME')
 SQL_PASSWORD = os.getenv('SQL_PASSWORD')
 SQL_DB = os.getenv('SQL_DB')
@@ -43,10 +41,6 @@ SECRET_KEY = os.getenv('APP_SECRET_KEY')
 ISSUER = "myFlaskWebService"
 AUDIENCE_MOBILE = "myMobileApp"
 client = Client(twilio_account_sid, twilio_auth_token)
-ALLOWED_EXTENSIONS = {'mp4', 'avi'}
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['TEMP_FOLDER'] = TEMP_FOLDER
 blueprint = Blueprint('api', __name__, url_prefix='/api')
 app.register_blueprint(blueprint)
 
