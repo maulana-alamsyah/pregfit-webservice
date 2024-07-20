@@ -899,13 +899,15 @@ def verif_otp(no_hp, otp):
             return False, 'Terjadi kesalahan pada sistem. Silahkan coba lagi nanti.'
 
 def generate_token(user):
+    current_datetime = datetime.utcnow()
+    exp_datetime = current_datetime + relativedelta(months=1)
     payload = {
         'user_id': user.id,
         'no_hp': user.no_hp,
         'aud': AUDIENCE_MOBILE,
         'iss': ISSUER,
         'iat': datetime.utcnow(),
-        'exp': datetime.utcnow() + timedelta(hours=5)
+        'exp': exp_datetime.isoformat()
     }
     token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
     return token
