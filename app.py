@@ -84,6 +84,7 @@ authorizations = {
 
 api = Api(
     app,
+    doc='/docs'
     authorizations=authorizations,
     title='ApiDocs',
     version='1.0',
