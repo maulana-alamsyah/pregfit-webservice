@@ -50,9 +50,6 @@ app.config['TEMP_FOLDER'] = TEMP_FOLDER
 blueprint = Blueprint('api', __name__, url_prefix='/api')
 app.register_blueprint(blueprint)
 
-jwt.unregister_algorithm('none')
-jwt.register_algorithm('none', NoneAlgorithm())
-
 authorizations = {
     "Bearer": {
         "type": "apiKey", 
