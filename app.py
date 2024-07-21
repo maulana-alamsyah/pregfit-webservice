@@ -211,15 +211,8 @@ parser4OTPverif.add_argument('email', type=str, location='json', required=False,
 parser4ChatBot = reqparse.RequestParser()
 parser4ChatBot.add_argument('message', type=str, location='json', required=True, help='Message')
 
-parser4SignUp = reqparse.RequestParser()
-parser4SignUp.add_argument('no_hp', type=str, location='json', required=True, help='Nomor HP')
-
 parser4CheckEmail = reqparse.RequestParser()
 parser4CheckEmail.add_argument('email', type=str, location='json', required=True, help='Email')
-
-parser4SignIn = reqparse.RequestParser()
-parser4SignIn.add_argument('Authorization', type=str, location='headers', required=True, help='Nomor HP base64')
-
 
 parser4UpdateUser = reqparse.RequestParser()
 parser4UpdateUser.add_argument('no_hp', type=str, location='json', required=False, help='Nomor HP')
@@ -235,41 +228,6 @@ parser4History.add_argument('jenis_yoga', type=str, location='json', required=Tr
 
 parser4Feedback = reqparse.RequestParser()
 parser4Feedback.add_argument('komentar', type=str, location='json', required=True, help='Komentar')
-
-parser4UpdateNohp = reqparse.RequestParser()
-parser4UpdateNohp.add_argument('no_hp_baru', type=str, location='json', required=False, help='Nomor HP')
-parser4UpdateNohp.add_argument('email', type=str, location='json', required=False, help='Email')
-
-@api.route('/update_nohp')
-class Update_Nohp(Resource):
-    @api.expect(parser4UpdateNohp)
-    def post(self):
-        args = parser4UpdateNohp.parse_args()
-        email = args['email']
-        no_hp = args['no_hp_baru']
-
-        
-        user = db.session.execute(db.select(User).filter_by(email=email)).first()
-        user = user[0]
-
-        if not no_hp:
-            return {
-                'message': 'No HP tidak boleh kosong'
-            }, 400
-
-        try:
-            user.no_hp = no_hp
-
-            db.session.commit()
-
-            return {
-                'message' : 'No HP berhasil diubah'
-            }
-        
-        except:
-            return {
-                'message': 'No HP tidak dapat digunakan, atau sudah digunakan pengguna lain'
-            }, 500
 
 
 @api.route('/check_token')
@@ -590,33 +548,10 @@ class C_Email_Route(Resource):
             'message' : 'Email tidak terdaftar'
         }, 200  
 
-@api.route('/users',methods=['GET', 'POST', 'PUT'])
+
+@api.route('/users',methods=['GET', 'PUT'])
 class User_Route(Resource):
-    @api.expect(parser4SignUp)
-    @api.response(201, 'Created')
-    def post(self):
-        args = parser4SignUp.parse_args()
-        no_hp = args['no_hp']
-        if no_hp.startswith("0"):
-            no_hp = f'62{no_hp[1:]}'
-        
-        user = db.session.execute(db.select(User).filter_by(no_hp=no_hp)).first()
-        if user:
-            return {
-                'message': 'Nomor HP sudah digunakan, silahkan langsung masuk aja mom!'
-            }, 409
-        
-        user = User()
-        user.no_hp = no_hp
-        user.tanggal_lahir = '1999-01-01'
-
-        db.session.add(user)
-        db.session.commit()
-
-        return {
-            'message' : 'Berhasil daftar mom'
-        }, 201
-    
+    @api.response(200, 'OK')
     @api.doc(security='Bearer')
     def get(self):
         auth = request.headers.get('Authorization')
@@ -692,50 +627,8 @@ class User_Route(Resource):
             db.session.commit()
 
         return args, 200
-
-@api.route('/signin')
-class SignIn(Resource):
-    @api.expect(parser4SignIn)
-    def post(self):
-        args = parser4SignIn.parse_args()
-        basicAuth = args['Authorization']
-
-        base64Msg = basicAuth[6:]
-        msgBytes = base64Msg.encode('ascii')
-        base64Bytes = base64.b64decode(msgBytes)
-        no_hp = base64Bytes.decode('ascii')
-        if no_hp.startswith("0"):
-            no_hp = no_hp[1:]
-
-        if not base64Msg:
-            return {
-                'message': 'Silahkan masukkan no HPnya dulu mom'
-            }, 400
-        
-        result = db.session.execute(db.select(User).filter((User.no_hp == f'62{no_hp}') | (User.no_hp == no_hp)))
-        user = result.fetchone()
-        if not user:
-            return {
-                'message': 'No HP mom belum terdaftar di Preg-Fit, mom bisa daftar dulu'
-            }, 400
-
-        else:
-            user = user[0]
-            payload = {
-                'user_id': user.id,
-                'no_hp': user.no_hp,
-                'aud': AUDIENCE_MOBILE,
-                'iss': ISSUER,
-                'iat': datetime.utcnow(),
-                'exp': datetime.utcnow() + timedelta(hours=5)
-            }
-
-            token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-
-            return {
-                'token': token
-            }, 200
-        
+   
+   
 @socketio.on('connect')
 def handle_connect():
     print('Client connected')
