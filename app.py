@@ -270,7 +270,7 @@ parser4SendOtpMail.add_argument('email', type=str, location='json', required=Tru
 parser4VerifyOtpMail = reqparse.RequestParser()
 parser4VerifyOtpMail.add_argument('api-key', type=str, location='headers', required=True, help='Api Key')
 parser4VerifyOtpMail.add_argument('otp', type=str, location='json', required=True, help='OTP')
-parser4VerifyOtpMail.add_argument('email', type=int, location='json', required=True, help='Email')
+parser4VerifyOtpMail.add_argument('email', type=str, location='json', required=True, help='Email')
 
 
 @api.route('/send-otp-mail')
