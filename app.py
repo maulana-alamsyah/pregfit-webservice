@@ -1,6 +1,8 @@
 from flask import Flask, Blueprint, request, jsonify
 from flask_restx import Resource, Api, Namespace, reqparse
 from flask_sqlalchemy import SQLAlchemy
+from flask_mail import Mail, Message
+from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import func
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.datastructures import FileStorage
@@ -44,6 +46,15 @@ client = Client(twilio_account_sid, twilio_auth_token)
 blueprint = Blueprint('api', __name__, url_prefix='/api')
 app.register_blueprint(blueprint)
 
+#Initialization email mailtrap
+app.config['MAIL_SERVER']='sandbox.smtp.mailtrap.io'
+app.config['MAIL_PORT'] = 2525
+app.config['MAIL_USERNAME'] = '0b6e4d62784525'
+app.config['MAIL_PASSWORD'] = '7705b93d4d5cf3'
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+mail = Mail(app)
+
 authorizations = {
     "Bearer": {
         "type": "apiKey", 
@@ -58,7 +69,7 @@ api = Api(
     doc='/docs',
     authorizations=authorizations,
     title='ApiDocs',
-    version='1.0',
+    version='2.0',
     description='Preg-Fit API Documentation',
     prefix='/api'
     )
@@ -178,6 +189,14 @@ def generate_token(user):
     token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
     return token
 
+def sendMail(email, otp):
+    msg = Message('Verifkasi OTP Bi-Cara', 
+                  sender=('Aplikasi Bi-Cara', 'bicara@yopmail.com'), 
+                  recipients=[email])
+    msg.body = "Kode verifikasi OTP kamu adalah " + otp
+    mail.send(msg)
+    return "OTP Sent to" + email
+
 class User(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     no_hp = db.Column(db.String(13), unique=True, nullable=True)
@@ -198,6 +217,14 @@ class Feedback(db.Model):
     user_id = db.Column(db.Integer(), nullable=False)
     komentar = db.Column(db.String(255), nullable=False)
 
+class Otp(db.Model):
+    __tablename__ = 'm_otp'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=True)
+    otp = db.Column(db.String(255), nullable=True)
+    otp_expired_at = db.Column(db.DateTime, nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, server_default=func.current_timestamp())
+    updated_at = db.Column(db.DateTime, nullable=False)
 
 parser4OTPsend = reqparse.RequestParser()
 parser4OTPsend.add_argument('no_hp', type=str, location='json', required=True, help='Nomor HP')
@@ -231,6 +258,119 @@ parser4Feedback.add_argument('komentar', type=str, location='json', required=Tru
 
 parser4CheckNo = reqparse.RequestParser()
 parser4CheckNo.add_argument('no_hp', type=str, location='json', required=True, help='Nomor HP')
+
+parser4SendOtpMail = reqparse.RequestParser()
+parser4SendOtpMail.add_argument('api-key', type=str, location='headers', required=True, help='API Key')
+parser4SendOtpMail.add_argument('email', type=int, location='json', required=True, help='Email')
+
+parser4VerifyOtpMail = reqparse.RequestParser()
+parser4VerifyOtpMail.add_argument('api-key', type=str, location='headers', required=True, help='Api Key')
+parser4VerifyOtpMail.add_argument('otp', type=str, location='json', required=True, help='OTP')
+parser4VerifyOtpMail.add_argument('email', type=int, location='json', required=True, help='Email')
+
+
+@api.route('/send-otp-mail')
+class SendOTPMail_Route(Resource):
+    @api.expect(parser4SendOtpMail, validate=True)
+    @api.response(200, 'OK')
+    def post(self):
+        args = parser4SendOtpMail.parse_args()
+        apiKey = args['api-key']
+        email = args['email']
+
+        # Dapatkan waktu saat ini dengan informasi zona waktu
+        now = datetime.now(local_timezone)
+
+        # Checking for API key validity
+        if API_KEY != apiKey:
+            return {'message': 'API KEY Invalid!'}, 400
+
+        try:
+            # Check OTP and its expiration
+            checkOtp = Otp.query.filter(Otp.email == email).first()
+            if checkOtp:
+                if checkOtp.otp_expired_at.tzinfo is None:
+                    checkOtp.otp_expired_at = local_timezone.localize(checkOtp.otp_expired_at)
+
+                if checkOtp.otp_expired_at > now:
+                    return {'message': 'OTP sudah kami kirim, cek email yuk'}, 400
+
+            # Konversi otp_expired_at ke waktu lokal jika tidak memiliki informasi zona waktu
+            
+
+            # Fetch user email
+            user = User.query.filter_by(email=email).first()
+            if not user:
+                return {'message': 'User tidak ditemukan'}, 400
+            
+            email = user.email
+
+            # Generate random 4-digit OTP
+            otp = random.randint(100000, 999999)
+            otp_expired_at = now + timedelta(minutes=5)
+
+            # Update OTP record
+            checkOtp.otp = generate_password_hash(str(otp))
+            checkOtp.otp_expired_at = otp_expired_at
+            checkOtp.updated_at = now
+
+            # Commit the session
+            db.session.commit()
+
+            # Send OTP to email
+            sendMail(email, str(otp))
+
+        except Exception as e:
+            return {'message': str(e)}, 500
+
+        return {
+            'message': 'Berhasil Resend OTP',
+            'data': {
+                'otp_expired_at': otp_expired_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'updated_at': checkOtp.updated_at.strftime('%Y-%m-%d %H:%M:%S')
+            }
+        }, 200
+
+
+@api.route('/verify-otp-mail')
+class VerifyOtp_Route(Resource):
+    @api.expect(parser4VerifyOtpMail, validate=True)
+    @api.response(200, 'OK')
+    def post(Self):
+        args = parser4VerifyOtpMail.parse_args()
+        apiKey = args['api-key']
+        otp = args['otp']
+        email = args['email']
+        
+        now = datetime.now(local_timezone)
+
+        #checking for api key is valid
+        if API_KEY != apiKey:
+            return {'message':'API KEY Invalid!'}, 400
+        
+        try:
+            #start transaction
+            with db.session.begin():
+        
+                #check code otp or otp_expired_at < now
+                checkOtp = Otp.query.filter(Otp.email==email).first()
+                if not check_password_hash(checkOtp.otp, otp):
+                    return {'message': 'OTP Invalid'}, 400
+                if checkOtp.otp_expired_at < datetime.now():
+                    return {'message': 'OTP Expired!'}, 400
+                        
+                #get user by email associated with the OTP
+                user = User.query.get(checkOtp.email)
+                if not user:
+                    return {'message': 'User not found!'}, 400
+
+        except Exception as e:
+            #rollback here
+            return {'message': str(e)}, 500
+
+        return {
+            'message' : 'Berhasil Verifikasi OTP'
+        }, 200
 
 
 @api.route('/check_token')
