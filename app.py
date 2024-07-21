@@ -51,8 +51,8 @@ app.register_blueprint(blueprint)
 #Initialization email mailtrap
 app.config['MAIL_SERVER']='sandbox.smtp.mailtrap.io'
 app.config['MAIL_PORT'] = 2525
-app.config['MAIL_USERNAME'] = '0b6e4d62784525'
-app.config['MAIL_PASSWORD'] = '7705b93d4d5cf3'
+app.config['MAIL_USERNAME'] = 'e70a85647988ef'
+app.config['MAIL_PASSWORD'] = '5709d3bd8962df'
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 mail = Mail(app)
