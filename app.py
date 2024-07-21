@@ -315,6 +315,7 @@ class SendOTPMail_Route(Resource):
             
             # Add OTP record
             OTP = Otp()
+            OTP.email = email
             OTP.otp = generate_password_hash(str(otp))
             OTP.otp_expired_at = otp_expired_at
             OTP.updated_at = now
