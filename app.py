@@ -390,7 +390,7 @@ class VerifyOtpMail_Route(Resource):
                     return {'message': 'OTP Invalid'}, 400
 
                 if checkOtp.otp_expired_at < now:
-                    return {'message': 'OTP Expired!'}, 400
+                    return {'message': 'OTP Expired!'}, 410
                         
                 #get user by email associated with the OTP
                 user = db.session.execute(db.select(User).filter_by(email=checkOtp.email)).first()
