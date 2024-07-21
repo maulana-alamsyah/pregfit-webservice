@@ -369,7 +369,7 @@ class VerifyOtp_Route(Resource):
                     return {'message': 'OTP Expired!'}, 400
                         
                 #get user by email associated with the OTP
-                user = User.query.get(checkOtp.email)
+                user = db.session.execute(db.select(User).filter_by(email=checkOtp.email)).first()
                 if not user:
                     return {'message': 'User not found!'}, 400
 
