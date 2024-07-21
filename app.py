@@ -208,13 +208,13 @@ def sendMail(email, otp):
             <h1 style="margin-top: 0;">Preg-Fit</h1>
         </div>
         <div style="height: 1px; background-color: #ecf0f1; margin: 20px 0;"></div>
-        <p>Hi Mom!<br/><br/>Ini dia kode rahasia kita. Jangan berikan kode ini ke siapa pun untuk alasan keamanan ya! <br/>Gunakan kode ini hanya untuk verifikasi akun <strong>{{app_name}}</strong> mom.<br/> Semoga hari mom menyenangkan yaa &#129392; &#129392;.</p><br> 
-      <center><span style="background: red; padding: 5px 15px 5px 15px; font-size: 20px; font-weight: bold; border-radius: 20px; color: white; background-color: #2c3e50;">{{otp}}</span></center>
+        <p>Hi Mom!<br/><br/>Ini dia kode rahasia kita. Jangan berikan kode ini ke siapa pun untuk alasan keamanan ya! <br/>Gunakan kode ini hanya untuk verifikasi akun <strong>Preg-Fit</strong> mom.<br/> Semoga hari mom menyenangkan yaa &#129392; &#129392;.</p><br> 
+      <center><span style="background: red; padding: 5px 15px 5px 15px; font-size: 20px; font-weight: bold; border-radius: 20px; color: white; background-color: #2c3e50;">{otp}</span></center>
             <div style="height: 1px; background-color: #ecf0f1; margin: 20px 0;"></div>
         <div style="text-align: center; padding: 20px; background-color: #ecf0f1;">
             <p style="font-size: 14px; color: #03265B; margin: 0;">&copy; <strong>Preg-Fit</strong></p><div class="yj6qo"></div><div class="adL">
         </div></div><div class="adL">
-    </div></div>'''
+    </div></div>'''.format(otp=otp)
     mail.send(msg)
     return "OTP Sent to" + email
 
