@@ -370,10 +370,13 @@ class VerifyOtpMail_Route(Resource):
                 if checkOtp is None:
                     return {'message': 'Silahkan resend OTP'}, 400
 
+                if checkOtp.otp_expired_at.tzinfo is None:
+                    checkOtp.otp_expired_at = local_timezone.localize(checkOtp.otp_expired_at)
+
                 if not check_password_hash(checkOtp.otp, otp):
                     return {'message': 'OTP Invalid'}, 400
 
-                if checkOtp.otp_expired_at < datetime.now(local_timezone):
+                if checkOtp.otp_expired_at < now:
                     return {'message': 'OTP Expired!'}, 400
                         
                 #get user by email associated with the OTP
