@@ -41,6 +41,7 @@ twilio_account_sid = os.getenv('TWILIO_SID')
 twilio_auth_token = os.getenv('TWILIO_TOKEN')
 twilio_services = os.getenv('TWILIO_SERVICES')
 SECRET_KEY = os.getenv('APP_SECRET_KEY')
+API_KEY = "aW5pYXBpa2V5bG9o"
 ISSUER = "myFlaskWebService"
 AUDIENCE_MOBILE = "myMobileApp"
 client = Client(twilio_account_sid, twilio_auth_token)
