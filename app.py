@@ -55,6 +55,8 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 mail = Mail(app)
 
+local_timezone = pytz.timezone('Asia/Jakarta')
+
 authorizations = {
     "Bearer": {
         "type": "apiKey", 
