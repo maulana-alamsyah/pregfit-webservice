@@ -294,7 +294,7 @@ class SendOTPMail_Route(Resource):
 
         try:
             # Check OTP and its expiration
-            checkOtp = Otp.query.filter(Otp.email == email).first()
+            checkOtp = Otp_Mail.query.filter(Otp_Mail.email == email).first()
             if checkOtp:
                 if checkOtp.otp_expired_at.tzinfo is None:
                     checkOtp.otp_expired_at = local_timezone.localize(checkOtp.otp_expired_at)
@@ -365,7 +365,7 @@ class VerifyOtp_Route(Resource):
             with db.session.begin():
         
                 #check code otp or otp_expired_at < now
-                checkOtp = Otp.query.filter(Otp.email==email).first()
+                checkOtp = Otp_Mail.query.filter(Otp.email==email).first()
                 if not check_password_hash(checkOtp.otp, otp):
                     return {'message': 'OTP Invalid'}, 400
                 if checkOtp.otp_expired_at < datetime.now():
