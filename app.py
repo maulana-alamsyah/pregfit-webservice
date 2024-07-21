@@ -373,7 +373,7 @@ class VerifyOtpMail_Route(Resource):
                 if not check_password_hash(checkOtp.otp, otp):
                     return {'message': 'OTP Invalid'}, 400
 
-                if checkOtp.otp_expired_at < datetime.now():
+                if checkOtp.otp_expired_at < datetime.now(local_timezone):
                     return {'message': 'OTP Expired!'}, 400
                         
                 #get user by email associated with the OTP
