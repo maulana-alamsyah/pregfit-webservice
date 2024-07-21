@@ -225,7 +225,7 @@ class Feedback(db.Model):
     user_id = db.Column(db.Integer(), nullable=False)
     komentar = db.Column(db.String(255), nullable=False)
 
-class Otp_Mail(db.Model):
+class OtpMail(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), nullable=True)
     otp = db.Column(db.String(255), nullable=True)
@@ -294,7 +294,7 @@ class SendOTPMail_Route(Resource):
 
         try:
             # Check OTP and its expiration
-            checkOtp = Otp_Mail.query.filter(Otp_Mail.email == email).first()
+            checkOtp = OtpMail.query.filter(OtpMail.email == email).first()
             if checkOtp:
                 if checkOtp.otp_expired_at.tzinfo is None:
                     checkOtp.otp_expired_at = local_timezone.localize(checkOtp.otp_expired_at)
@@ -317,14 +317,14 @@ class SendOTPMail_Route(Resource):
             otp_expired_at = now + timedelta(minutes=5)
             
             # Add OTP record
-            OTP_Mail = Otp_Mail()
-            OTP_Mail.email = email
-            OTP_Mail.otp = generate_password_hash(str(otp))
-            OTP_Mail.otp_expired_at = otp_expired_at
-            OTP_Mail.updated_at = now
+            OTPMail = OtpMail()
+            OTPMail.email = email
+            OTPMail.otp = generate_password_hash(str(otp))
+            OTPMail.otp_expired_at = otp_expired_at
+            OTPMail.updated_at = now
 
-            # Add the OTP_Mail object to the session
-            db.session.add(OTP_Mail)
+            # Add the OTPMail object to the session
+            db.session.add(OTPMail)
 
             # Commit the session
             db.session.commit()
@@ -339,7 +339,7 @@ class SendOTPMail_Route(Resource):
             'message': 'Berhasil Send OTP',
             'data': {
                 'otp_expired_at': otp_expired_at.strftime('%Y-%m-%d %H:%M:%S'),
-                'updated_at': OTP_Mail.updated_at.strftime('%Y-%m-%d %H:%M:%S')
+                'updated_at': OTPMail.updated_at.strftime('%Y-%m-%d %H:%M:%S')
             }
         }, 200
 
@@ -365,7 +365,7 @@ class VerifyOtp_Route(Resource):
             with db.session.begin():
         
                 #check code otp or otp_expired_at < now
-                checkOtp = Otp_Mail.query.filter(Otp.email==email).first()
+                checkOtp = OtpMail.query.filter(OtpMail.email==email).first()
                 if not check_password_hash(checkOtp.otp, otp):
                     return {'message': 'OTP Invalid'}, 400
                 if checkOtp.otp_expired_at < datetime.now():
