@@ -34,25 +34,29 @@ app = Flask(__name__)
 socketio = SocketIO(app,async_mode=None)
 load_dotenv()
 CORS(app)
+
 SQL_USERNAME = os.getenv('SQL_USERNAME')
 SQL_PASSWORD = os.getenv('SQL_PASSWORD')
 SQL_DB = os.getenv('SQL_DB')
+
 twilio_account_sid = os.getenv('TWILIO_SID')
 twilio_auth_token = os.getenv('TWILIO_TOKEN')
 twilio_services = os.getenv('TWILIO_SERVICES')
+client = Client(twilio_account_sid, twilio_auth_token)
+
+
 SECRET_KEY = os.getenv('APP_SECRET_KEY')
-API_KEY = "aW5pYXBpa2V5bG9o"
+API_KEY = os.getenv('API_KEY')
 ISSUER = "myFlaskWebService"
 AUDIENCE_MOBILE = "myMobileApp"
-client = Client(twilio_account_sid, twilio_auth_token)
 blueprint = Blueprint('api', __name__, url_prefix='/api')
 app.register_blueprint(blueprint)
 
-#Initialization email mailtrap
-app.config['MAIL_SERVER']='sandbox.smtp.mailtrap.io'
+
+app.config['MAIL_SERVER']= os.getenv('MAIL_SERVER')
 app.config['MAIL_PORT'] = 2525
-app.config['MAIL_USERNAME'] = 'e70a85647988ef'
-app.config['MAIL_PASSWORD'] = '5709d3bd8962df'
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 mail = Mail(app)
@@ -221,8 +225,7 @@ class Feedback(db.Model):
     user_id = db.Column(db.Integer(), nullable=False)
     komentar = db.Column(db.String(255), nullable=False)
 
-class Otp(db.Model):
-    __tablename__ = 'm_otp'
+class Otp_Mail(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), nullable=True)
     otp = db.Column(db.String(255), nullable=True)
@@ -273,7 +276,7 @@ parser4VerifyOtpMail.add_argument('otp', type=str, location='json', required=Tru
 parser4VerifyOtpMail.add_argument('email', type=str, location='json', required=True, help='Email')
 
 
-@api.route('/send-otp-mail')
+@api.route('/send_otp_mail')
 class SendOTPMail_Route(Resource):
     @api.expect(parser4SendOtpMail, validate=True)
     @api.response(200, 'OK')
@@ -301,10 +304,7 @@ class SendOTPMail_Route(Resource):
                 else:
                     db.session.delete(checkOtp)
                     db.session.commit()
-
-            # Konversi otp_expired_at ke waktu lokal jika tidak memiliki informasi zona waktu
             
-
             # Fetch user email
             user = User.query.filter_by(email=email).first()
             if not user:
@@ -317,14 +317,14 @@ class SendOTPMail_Route(Resource):
             otp_expired_at = now + timedelta(minutes=5)
             
             # Add OTP record
-            OTP = Otp()
-            OTP.email = email
-            OTP.otp = generate_password_hash(str(otp))
-            OTP.otp_expired_at = otp_expired_at
-            OTP.updated_at = now
+            OTP_Mail = Otp_Mail()
+            OTP_Mail.email = email
+            OTP_Mail.otp = generate_password_hash(str(otp))
+            OTP_Mail.otp_expired_at = otp_expired_at
+            OTP_Mail.updated_at = now
 
-            # Add the OTP object to the session
-            db.session.add(OTP)
+            # Add the OTP_Mail object to the session
+            db.session.add(OTP_Mail)
 
             # Commit the session
             db.session.commit()
@@ -344,7 +344,7 @@ class SendOTPMail_Route(Resource):
         }, 200
 
 
-@api.route('/verify-otp-mail')
+@api.route('/verify_otp_mail')
 class VerifyOtp_Route(Resource):
     @api.expect(parser4VerifyOtpMail, validate=True)
     @api.response(200, 'OK')
