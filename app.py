@@ -332,7 +332,7 @@ class SendOTPMail_Route(Resource):
             'message': 'Berhasil Resend OTP',
             'data': {
                 'otp_expired_at': otp_expired_at.strftime('%Y-%m-%d %H:%M:%S'),
-                'updated_at': checkOtp.updated_at.strftime('%Y-%m-%d %H:%M:%S')
+                'updated_at': OTP.updated_at.strftime('%Y-%m-%d %H:%M:%S')
             }
         }, 200
 
