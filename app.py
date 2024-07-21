@@ -345,7 +345,7 @@ class SendOTPMail_Route(Resource):
 
 
 @api.route('/verify_otp_mail')
-class VerifyOtp_Route(Resource):
+class VerifyOtpMail_Route(Resource):
     @api.expect(parser4VerifyOtpMail, validate=True)
     @api.response(200, 'OK')
     def post(Self):
@@ -366,15 +366,20 @@ class VerifyOtp_Route(Resource):
         
                 #check code otp or otp_expired_at < now
                 checkOtp = OtpMail.query.filter(OtpMail.email==email).first()
+
+                if checkOtp is None:
+                    return {'message': 'Silahkan resend OTP'}, 400
+
                 if not check_password_hash(checkOtp.otp, otp):
                     return {'message': 'OTP Invalid'}, 400
+
                 if checkOtp.otp_expired_at < datetime.now():
                     return {'message': 'OTP Expired!'}, 400
                         
                 #get user by email associated with the OTP
                 user = db.session.execute(db.select(User).filter_by(email=checkOtp.email)).first()
                 if not user:
-                    return {'message': 'User not found!'}, 400
+                    return {'message': 'Akun tidak ditemukan!'}, 400
                 
                 # Remove the OTP record after successful verification
                 db.session.delete(checkOtp)
