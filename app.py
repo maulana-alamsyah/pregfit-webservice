@@ -298,6 +298,9 @@ class SendOTPMail_Route(Resource):
 
                 if checkOtp.otp_expired_at > now:
                     return {'message': 'OTP sudah kami kirim, cek email yuk'}, 400
+                else:
+                    db.session.delete(checkOtp)
+                    db.session.commit()
 
             # Konversi otp_expired_at ke waktu lokal jika tidak memiliki informasi zona waktu
             
@@ -333,7 +336,7 @@ class SendOTPMail_Route(Resource):
             return {'message': str(e)}, 500
 
         return {
-            'message': 'Berhasil Resend OTP',
+            'message': 'Berhasil Send OTP',
             'data': {
                 'otp_expired_at': otp_expired_at.strftime('%Y-%m-%d %H:%M:%S'),
                 'updated_at': OTP.updated_at.strftime('%Y-%m-%d %H:%M:%S')
@@ -372,6 +375,10 @@ class VerifyOtp_Route(Resource):
                 user = db.session.execute(db.select(User).filter_by(email=checkOtp.email)).first()
                 if not user:
                     return {'message': 'User not found!'}, 400
+                
+                # Remove the OTP record after successful verification
+                db.session.delete(checkOtp)
+                
 
         except Exception as e:
             #rollback here
