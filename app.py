@@ -204,7 +204,7 @@ def sendMail(email, otp):
     msg.body = "Kode verifikasi OTP kamu adalah " + otp
     msg.html = '''<div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden;">
         <div style="background-color: #fff;; padding: 0 20px; text-align: center; color: #7F91AA;">
-            <img style="display: block; margin: 0 auto; width: 80px;" src="https://i.ibb.co/vqMCTdS/Untitled-design-4.png" title="logo" alt="logo" data-bit="iit">
+            <img style="display: block; margin: 0 auto; width: 80px;" src="https://ibb.co.com/yyjJKVG" title="logo" alt="logo" data-bit="iit">
             <h1 style="margin-top: 0;">Preg-Fit</h1>
         </div>
         <div style="height: 1px; background-color: #ecf0f1; margin: 20px 0;"></div>
