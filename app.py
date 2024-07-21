@@ -229,6 +229,9 @@ parser4History.add_argument('jenis_yoga', type=str, location='json', required=Tr
 parser4Feedback = reqparse.RequestParser()
 parser4Feedback.add_argument('komentar', type=str, location='json', required=True, help='Komentar')
 
+parser4CheckNo = reqparse.RequestParser()
+parser4CheckNo.add_argument('no_hp', type=str, location='json', required=True, help='Nomor HP')
+
 
 @api.route('/check_token')
 class C_Token_Route(Resource):
@@ -434,10 +437,10 @@ class Chatbot_Route(Resource):
 
 @api.route('/check_no')
 class Check_No_Route(Resource):
-    @api.expect(parser4SignUp)
+    @api.expect(parser4CheckNo)
     @api.response(200, 'OK')
     def post(self):
-        args = parser4SignUp.parse_args()
+        args = parser4CheckNo.parse_args()
         no_hp = args['no_hp']
 
         if no_hp.startswith("0"):
