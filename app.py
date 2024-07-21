@@ -261,7 +261,7 @@ parser4CheckNo.add_argument('no_hp', type=str, location='json', required=True, h
 
 parser4SendOtpMail = reqparse.RequestParser()
 parser4SendOtpMail.add_argument('api-key', type=str, location='headers', required=True, help='API Key')
-parser4SendOtpMail.add_argument('email', type=int, location='json', required=True, help='Email')
+parser4SendOtpMail.add_argument('email', type=str, location='json', required=True, help='Email')
 
 parser4VerifyOtpMail = reqparse.RequestParser()
 parser4VerifyOtpMail.add_argument('api-key', type=str, location='headers', required=True, help='Api Key')
