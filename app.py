@@ -198,8 +198,8 @@ def generate_token(user):
     return token
 
 def sendMail(email, otp):
-    msg = Message('Verifkasi OTP Bi-Cara', 
-                  sender=('Aplikasi Bi-Cara', 'bicara@yopmail.com'), 
+    msg = Message('Verifkasi OTP Preg-Fit', 
+                  sender=('Aplikasi Preg-Fit', 'preg-fit@yopmail.com'), 
                   recipients=[email])
     msg.body = "Kode verifikasi OTP kamu adalah " + otp
     mail.send(msg)
@@ -339,7 +339,7 @@ class SendOTPMail_Route(Resource):
             'message': 'Berhasil Send OTP',
             'data': {
                 'otp_expired_at': otp_expired_at.strftime('%Y-%m-%d %H:%M:%S'),
-                'updated_at': OTP.updated_at.strftime('%Y-%m-%d %H:%M:%S')
+                'updated_at': OTP_Mail.updated_at.strftime('%Y-%m-%d %H:%M:%S')
             }
         }, 200
 
