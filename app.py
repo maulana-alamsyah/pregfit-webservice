@@ -312,12 +312,15 @@ class SendOTPMail_Route(Resource):
             # Generate random 4-digit OTP
             otp = random.randint(100000, 999999)
             otp_expired_at = now + timedelta(minutes=5)
-
+            
             # Add OTP record
             OTP = Otp()
             OTP.otp = generate_password_hash(str(otp))
             OTP.otp_expired_at = otp_expired_at
             OTP.updated_at = now
+
+            # Add the OTP object to the session
+            db.session.add(OTP)
 
             # Commit the session
             db.session.commit()
