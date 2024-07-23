@@ -786,6 +786,11 @@ class User_Route(Resource):
         except:
             return {'message': 'Token tidak valid, silahkan masuk dulu mom'}, 401
 
+        if email:
+            existing_user = db.session.execute(db.select(User).filter_by(email=email)).first()
+            if existing_user and existing_user[0].id != userdb.id:
+                return {'message': 'Email sudah digunakan oleh pengguna lain mom.'}, 400
+
         isUpdate = False
         if no_hp:
             userdb.no_hp = no_hp
