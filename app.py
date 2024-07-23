@@ -618,7 +618,7 @@ class Check_No_Route(Resource):
     @api.response(200, 'OK')
     def post(self):
         args = parser4CheckNo.parse_args()
-        no_hp = args['no_hp']
+        no_hp = format_phone_number(args['no_hp'])
 
         if no_hp.startswith("0"):
             no_hp = no_hp[1:]
