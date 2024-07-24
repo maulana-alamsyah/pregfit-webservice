@@ -313,7 +313,7 @@ class SendOTPMail_Route(Resource):
                     checkOtp.otp_expired_at = local_timezone.localize(checkOtp.otp_expired_at)
 
                 if checkOtp.otp_expired_at > now:
-                    return {'message': 'OTP sudah kami kirim, cek email yuk'}, 400
+                    return {'message': 'OTP sudah kami kirim, cek email yuk'}, 409
                 else:
                     db.session.delete(checkOtp)
                     db.session.commit()
