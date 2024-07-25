@@ -240,8 +240,8 @@ class Feedback(db.Model):
 
 class OtpMail(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(255), nullable=True)
-    otp = db.Column(db.String(255), nullable=True)
+    email = db.Column(db.String(32), nullable=True)
+    otp = db.Column(db.String(128), nullable=True)
     otp_expired_at = db.Column(db.DateTime, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, server_default=func.current_timestamp())
     updated_at = db.Column(db.DateTime, nullable=False)
