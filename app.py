@@ -1031,6 +1031,6 @@ if __name__ == '__main__':
     bert_load_model = TFBertForSequenceClassification.from_pretrained(PRE_TRAINED_MODEL, num_labels=6)
 
     #Load Model
-    bert_load_model.load_weights('model/chatbot-model.h5')
+    bert_load_model.load_weights('model/model_chatbot.h5')
 
     socketio.run(app, debug=True, host='0.0.0.0')
