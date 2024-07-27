@@ -227,19 +227,19 @@
         ],
         "responses": [
           {
-            "response": "Baik pertanyaan selanjutnya, Apakah Mom ada keluhan atau tidak? Seperti nyeri perut/kram perut atau keluar darah/flek?",
+            "response": "Baik pertanyaan selanjutnya, Apakah Mom ada keluhan seperti nyeri perut/kram perut atau keluar darah/flek, Demam? Pusing? Mual? Muntah? Batuk? Flu?",
             "value": 1
           },
           {
-            "response": "Selanjutnya, Apakah Mom ada keluhan atau tidak? Seperti nyeri perut/kram perut atau keluar darah/flek?",
+            "response": "Selanjutnya, Apakah Mom ada keluhan atau tidak? Seperti nyeri perut/kram perut atau keluar darah/flek, Demam? Pusing? Mual? Muntah? Batuk? Flu?",
             "value": 1
           },
           {
-            "response": "Lalu, Apakah Mom ada keluhan atau tidak? Seperti nyeri perut/kram perut atau keluar darah/flek?",
+            "response": "Lalu, Apakah Mom ada keluhan atau tidak? Seperti nyeri perut/kram perut atau keluar darah/flek, Demam? Pusing? Mual? Muntah? Batuk? Flu?",
             "value": 1
           },
           {
-            "response": "Pertanyaan selanjutnya, Apakah Mom ada keluhan atau tidak? Seperti nyeri perut/kram perut atau keluar darah/flek?",
+            "response": "Pertanyaan selanjutnya, Apakah Mom ada keluhan atau tidak? Seperti nyeri perut/kram perut atau keluar darah/flek, Demam? Pusing? Mual? Muntah? Batuk? Flu?",
             "value": 1
           }
         ]
@@ -331,6 +331,62 @@
     {
         "tag": "pertanyaan3positif",
         "patterns": [
+          "Tidak, saya tidak mengalami nyeri perut",
+          "Tidak, saya tidak mengalami kram perut",
+          "Tidak, saya tidak mengalami keluar darah",
+          "Tidak, saya tidak mengalami flek",
+          "Tidak, saya tidak merasakan nyeri di bagian bawah perut",
+          "Tidak, saya tidak merasakan kram perut secara berkala",
+          "Tidak, saya tidak mengalami pendarahan ringan",
+          "Tidak, saya tidak mengalami flek coklat",
+          "Tidak, saya tidak sering merasakan nyeri perut di pagi hari",
+          "Tidak, saya tidak sering merasakan kram perut setelah makan",
+          "Tidak, saya tidak pernah mengalami keluar darah",
+          "Tidak, saya tidak pernah mengalami flek di awal kehamilan",
+          "Tidak, saya tidak merasa nyeri perut terutama saat bergerak",
+          "Tidak, saya tidak merasa kram perut saat duduk terlalu lama",
+          "Tidak, saya tidak melihat bercak darah di pakaian dalam",
+          "Tidak, saya tidak melihat flek merah muda",
+          "Tidak, saya tidak merasakan nyeri perut yang konstan",
+          "Tidak, saya tidak merasakan kram perut yang cukup parah",
+          "Tidak, saya tidak mengalami pendarahan saat beraktivitas",
+          "Tidak, saya tidak mengalami flek berwarna gelap",
+          "Tidak, saya tidak merasa nyeri perut saat berbaring",
+          "Tidak, saya tidak merasa kram perut saat berjalan",
+          "Tidak, saya tidak melihat darah segar saat buang air kecil",
+          "Tidak, saya tidak melihat flek berwarna merah kecoklatan",
+          "Tidak, saya tidak merasakan nyeri perut setiap hari",
+          "Tidak, saya tidak merasakan kram perut saat malam hari",
+          "Tidak, saya tidak pernah mengalami pendarahan hebat",
+          "Tidak, saya tidak pernah mengalami flek yang banyak",
+          "Tidak, saya tidak merasa nyeri perut setelah makan makanan tertentu",
+          "Tidak, saya tidak merasa kram perut saat berdiri lama",
+          "Tidak, saya tidak melihat darah setelah berolahraga ringan",
+          "Tidak, saya tidak melihat flek saat bangun tidur",
+          "Tidak, saya tidak merasakan nyeri perut yang tidak kunjung hilang",
+          "Tidak, saya tidak merasakan kram perut yang intens",
+          "Tidak, saya tidak mengalami pendarahan terus-menerus",
+          "Tidak, saya tidak mengalami flek setiap hari",
+          "Tidak, saya tidak merasa nyeri perut saat beristirahat",
+          "Tidak, saya tidak merasa kram perut saat hamil muda",
+          "Tidak, saya tidak melihat darah saat mandi",
+          "Tidak, saya tidak melihat flek saat sore hari",
+          "Tidak, saya tidak merasakan nyeri perut saat naik tangga",
+          "Tidak, saya tidak merasakan kram perut saat bekerja",
+          "Tidak, saya tidak pernah mengalami pendarahan yang mengkhawatirkan",
+          "Tidak, saya tidak pernah mengalami flek setelah kelelahan",
+          "Tidak, saya tidak merasa nyeri perut saat mengangkat barang berat",
+          "Tidak, saya tidak merasa kram perut setelah makan banyak",
+          "Tidak, saya tidak melihat darah saat melakukan aktivitas ringan",
+          "Tidak, saya tidak melihat flek saat berbaring",
+          "Tidak, saya tidak merasakan nyeri perut setiap kali berjalan",
+          "Tidak, saya tidak merasakan kram perut yang sangat menyakitkan",
+          "Tidak, saya tidak mengalami pendarahan setelah beraktivitas berat",
+          "Tidak, saya tidak mengalami flek saat kehamilan trimester pertama",
+          "Tidak, saya tidak merasa nyeri perut saat kehamilan trimester kedua",
+          "Tidak, saya tidak merasa kram perut saat hamil tua",
+          "Tidak, saya tidak melihat darah saat hamil trimester ketiga",
+          "Tidak, saya tidak melihat flek berwarna merah terang",
           "Tidak, saya tidak mengalami demam",
           "Tidak, saya tidak mengalami pusing",
           "Tidak, saya tidak mengalami mual",
@@ -388,23 +444,30 @@
           "Tidak, saya tidak mengalami infeksi jamur",
           "Tidak, saya tidak mengalami luka yang tidak sembuh-sembuh",
           "Tidak, saya tidak mengalami keringat berlebihan",
-          "Tidak, saya tidak mengalami masalah kulit"
+          "Tidak, saya tidak mengalami masalah kulit",
+          "Tidak ada keluhan",
+          "Tidak memiliki keluhan",
+          "Tidak mengalami keluhan",
+          "Saya tidak memiliki keluhan",
+          "Tidak, saya tidak ada keluhan",
+          "Tidak, saya tidak memiliki keluhan",
+          "Tidak, saya tidak mengalami keluhan"
         ],
         "responses": [
           {
-            "response": "Baik pertanyaan selanjutnya, Apakah Mom ada keluhan lain? Demam? Pusing? Mual? Muntah? Batuk? Flu?",
+            "response": "Baik pertanyaan selanjutnya, Apakah Mom ada minum vitamin atau penguat kandungan?",
             "value": 1
           },
           {
-            "response": "Selanjutnya, Apakah Mom ada keluhan lain? Demam? Pusing? Mual? Muntah? Batuk? Flu?",
+            "response": "Selanjutnya, Apakah Mom ada minum vitamin atau penguat kandungan?",
             "value": 1
           },
           {
-            "response": "Lalu, Apakah Mom merasa ada keluhan lain? Demam? Pusing? Mual? Muntah? Batuk? Flu?",
+            "response": "Lalu, Apakah Mom ada minum vitamin atau penguat kandungan?",
             "value": 1
           },
           {
-            "response": "Pertanyaan selanjutnya, Apakah Mom ada keluhan lain? Demam? Pusing? Mual? Muntah? Batuk? Flu?",
+            "response": "Pertanyaan selanjutnya, Apakah Mom ada minum vitamin atau penguat kandungan?",
             "value": 1
           }
         ]
@@ -412,6 +475,62 @@
     {
         "tag": "pertanyaan3negative",
         "patterns": [
+          "Ya, saya mengalami nyeri perut",
+          "Ya, saya mengalami kram perut",
+          "Ya, saya mengalami keluar darah",
+          "Ya, saya mengalami flek",
+          "Ya, saya merasakan nyeri di bagian bawah perut",
+          "Ya, saya merasakan kram perut secara berkala",
+          "Ya, saya mengalami pendarahan ringan",
+          "Ya, saya mengalami flek coklat",
+          "Ya, saya sering merasakan nyeri perut di pagi hari",
+          "Ya, saya sering merasakan kram perut setelah makan",
+          "Ya, saya pernah mengalami keluar darah beberapa kali",
+          "Ya, saya pernah mengalami flek di awal kehamilan",
+          "Ya, saya merasa nyeri perut terutama saat bergerak",
+          "Ya, saya merasa kram perut saat duduk terlalu lama",
+          "Ya, saya melihat bercak darah di pakaian dalam",
+          "Ya, saya melihat flek merah muda",
+          "Ya, saya merasakan nyeri perut yang konstan",
+          "Ya, saya merasakan kram perut yang cukup parah",
+          "Ya, saya mengalami pendarahan saat beraktivitas",
+          "Ya, saya mengalami flek berwarna gelap",
+          "Ya, saya merasa nyeri perut saat berbaring",
+          "Ya, saya merasa kram perut saat berjalan",
+          "Ya, saya melihat darah segar saat buang air kecil",
+          "Ya, saya melihat flek berwarna merah kecoklatan",
+          "Ya, saya merasakan nyeri perut setiap hari",
+          "Ya, saya merasakan kram perut saat malam hari",
+          "Ya, saya pernah mengalami pendarahan hebat",
+          "Ya, saya pernah mengalami flek yang banyak",
+          "Ya, saya merasa nyeri perut setelah makan makanan tertentu",
+          "Ya, saya merasa kram perut saat berdiri lama",
+          "Ya, saya melihat darah setelah berolahraga ringan",
+          "Ya, saya melihat flek saat bangun tidur",
+          "Ya, saya merasakan nyeri perut yang tidak kunjung hilang",
+          "Ya, saya merasakan kram perut yang intens",
+          "Ya, saya mengalami pendarahan terus-menerus",
+          "Ya, saya mengalami flek setiap hari",
+          "Ya, saya merasa nyeri perut saat beristirahat",
+          "Ya, saya merasa kram perut saat hamil muda",
+          "Ya, saya melihat darah saat mandi",
+          "Ya, saya melihat flek saat sore hari",
+          "Ya, saya merasakan nyeri perut saat naik tangga",
+          "Ya, saya merasakan kram perut saat bekerja",
+          "Ya, saya pernah mengalami pendarahan yang mengkhawatirkan",
+          "Ya, saya pernah mengalami flek setelah kelelahan",
+          "Ya, saya merasa nyeri perut saat mengangkat barang berat",
+          "Ya, saya merasa kram perut setelah makan banyak",
+          "Ya, saya melihat darah saat melakukan aktivitas ringan",
+          "Ya, saya melihat flek saat berbaring",
+          "Ya, saya merasakan nyeri perut setiap kali berjalan",
+          "Ya, saya merasakan kram perut yang sangat menyakitkan",
+          "Ya, saya mengalami pendarahan setelah beraktivitas berat",
+          "Ya, saya mengalami flek saat kehamilan trimester pertama",
+          "Ya, saya merasa nyeri perut saat kehamilan trimester kedua",
+          "Ya, saya merasa kram perut saat hamil tua",
+          "Ya, saya melihat darah saat hamil trimester ketiga",
+          "Ya, saya melihat flek berwarna merah terang",
           "Ya, saya mengalami demam",
           "Ya, saya mengalami pusing",
           "Ya, saya mengalami mual",
@@ -469,7 +588,13 @@
           "Ya, saya mengalami infeksi jamur",
           "Ya, saya mengalami luka yang tidak sembuh-sembuh",
           "Ya, saya mengalami keringat berlebihan",
-          "Ya, saya mengalami masalah kulit"
+          "Ya, saya mengalami masalah kulit",
+          "Ya, saya memiliki keluhan",
+          "Ya, saya ada keluhan",
+          "Ya, saya mengalami keluhan",
+          "Ya, ada keluhan",
+          "Ya, mengalami keluhan",
+          "Ya, memiliki keluhan"
         ],
         "responses": [
           {
@@ -496,172 +621,6 @@
     },
     {
         "tag": "pertanyaan4positif",
-        "patterns": [
-          "Tidak, saya tidak mengalami demam",
-          "Tidak, saya tidak mengalami pusing",
-          "Tidak, saya tidak mengalami mual",
-          "Tidak, saya tidak mengalami muntah",
-          "Tidak, saya tidak mengalami batuk",
-          "Tidak, saya tidak mengalami flu",
-          "Tidak, saya tidak mengalami sakit kepala",
-          "Tidak, saya tidak mengalami nyeri punggung",
-          "Tidak, saya tidak mengalami kram perut",
-          "Tidak, saya tidak mengalami kaki bengkak",
-          "Tidak, saya tidak mengalami sembelit",
-          "Tidak, saya tidak mengalami gangguan tidur",
-          "Tidak, saya tidak mengalami gatal-gatal",
-          "Tidak, saya tidak mengalami kelelahan",
-          "Tidak, saya tidak mengalami perut kembung",
-          "Tidak, saya tidak mengalami sering buang air kecil",
-          "Tidak, saya tidak mengalami perubahan suasana hati",
-          "Tidak, saya tidak mengalami tekanan darah tinggi",
-          "Tidak, saya tidak mengalami sesak napas",
-          "Tidak, saya tidak mengalami gangguan pencernaan",
-          "Tidak, saya tidak mengalami nyeri panggul",
-          "Tidak, saya tidak mengalami perdarahan ringan",
-          "Tidak, saya tidak mengalami nyeri payudara",
-          "Tidak, saya tidak mengalami sulit berkonsentrasi",
-          "Tidak, saya tidak mengalami rasa panas di dada",
-          "Tidak, saya tidak mengalami kehilangan nafsu makan",
-          "Tidak, saya tidak mengalami hidung tersumbat",
-          "Tidak, saya tidak mengalami mimisan",
-          "Tidak, saya tidak mengalami rasa tidak nyaman di perut",
-          "Tidak, saya tidak mengalami infeksi saluran kemih",
-          "Tidak, saya tidak mengalami nyeri pada kaki",
-          "Tidak, saya tidak mengalami nyeri pada tangan",
-          "Tidak, saya tidak mengalami penglihatan kabur",
-          "Tidak, saya tidak mengalami mual di pagi hari",
-          "Tidak, saya tidak mengalami muntah setelah makan",
-          "Tidak, saya tidak mengalami diare",
-          "Tidak, saya tidak mengalami kesemutan",
-          "Tidak, saya tidak mengalami kram kaki",
-          "Tidak, saya tidak mengalami pembengkakan di wajah",
-          "Tidak, saya tidak mengalami suara serak",
-          "Tidak, saya tidak mengalami gangguan pendengaran",
-          "Tidak, saya tidak mengalami nyeri sendi",
-          "Tidak, saya tidak mengalami mudah berkeringat",
-          "Tidak, saya tidak mengalami kulit kering",
-          "Tidak, saya tidak mengalami rambut rontok",
-          "Tidak, saya tidak mengalami gangguan tidur di malam hari",
-          "Tidak, saya tidak mengalami gelisah",
-          "Tidak, saya tidak mengalami stres",
-          "Tidak, saya tidak mengalami cemas",
-          "Tidak, saya tidak mengalami berat badan naik drastis",
-          "Tidak, saya tidak mengalami berat badan turun drastis",
-          "Tidak, saya tidak mengalami nyeri gigi",
-          "Tidak, saya tidak mengalami gusi berdarah",
-          "Tidak, saya tidak mengalami masalah gigi dan mulut",
-          "Tidak, saya tidak mengalami infeksi jamur",
-          "Tidak, saya tidak mengalami luka yang tidak sembuh-sembuh",
-          "Tidak, saya tidak mengalami keringat berlebihan",
-          "Tidak, saya tidak mengalami masalah kulit"
-        ],
-        "responses": [
-          {
-            "response": "Baik pertanyaan selanjutnya, Apakah Mom merasa nyaman melakukan gerakan yoga hamil secara mandiri?",
-            "value": 1
-          },
-          {
-            "response": "Selanjutnya, Terkait riwayat obat? Apakah Mom ada minum vitamin atau penguat kandungan?",
-            "value": 1
-          },
-          {
-            "response": "Lalu, Terkait riwayat obat? Apakah Mom ada minum vitamin atau penguat kandungan?",
-            "value": 1
-          },
-          {
-            "response": "Pertanyaan selanjutnya, Terkait riwayat obat? Apakah Mom ada minum vitamin atau penguat kandungan?",
-            "value": 1
-          }
-        ]
-    },
-    {
-        "tag": "pertanyaan4negative",
-        "patterns": [
-          "Ya, saya mengalami demam",
-          "Ya, saya mengalami pusing",
-          "Ya, saya mengalami mual",
-          "Ya, saya mengalami muntah",
-          "Ya, saya mengalami batuk",
-          "Ya, saya mengalami flu",
-          "Ya, saya mengalami sakit kepala",
-          "Ya, saya mengalami nyeri punggung",
-          "Ya, saya mengalami kram perut",
-          "Ya, saya mengalami kaki bengkak",
-          "Ya, saya mengalami sembelit",
-          "Ya, saya mengalami gangguan tidur",
-          "Ya, saya mengalami gatal-gatal",
-          "Ya, saya mengalami kelelahan",
-          "Ya, saya mengalami perut kembung",
-          "Ya, saya mengalami sering buang air kecil",
-          "Ya, saya mengalami perubahan suasana hati",
-          "Ya, saya mengalami tekanan darah tinggi",
-          "Ya, saya mengalami sesak napas",
-          "Ya, saya mengalami gangguan pencernaan",
-          "Ya, saya mengalami nyeri panggul",
-          "Ya, saya mengalami perdarahan ringan",
-          "Ya, saya mengalami nyeri payudara",
-          "Ya, saya mengalami sulit berkonsentrasi",
-          "Ya, saya mengalami rasa panas di dada",
-          "Ya, saya mengalami kehilangan nafsu makan",
-          "Ya, saya mengalami hidung tersumbat",
-          "Ya, saya mengalami mimisan",
-          "Ya, saya mengalami rasa tidak nyaman di perut",
-          "Ya, saya mengalami infeksi saluran kemih",
-          "Ya, saya mengalami nyeri pada kaki",
-          "Ya, saya mengalami nyeri pada tangan",
-          "Ya, saya mengalami penglihatan kabur",
-          "Ya, saya mengalami mual di pagi hari",
-          "Ya, saya mengalami muntah setelah makan",
-          "Ya, saya mengalami diare",
-          "Ya, saya mengalami kesemutan",
-          "Ya, saya mengalami kram kaki",
-          "Ya, saya mengalami pembengkakan di wajah",
-          "Ya, saya mengalami suara serak",
-          "Ya, saya mengalami gangguan pendengaran",
-          "Ya, saya mengalami nyeri sendi",
-          "Ya, saya mengalami mudah berkeringat",
-          "Ya, saya mengalami kulit kering",
-          "Ya, saya mengalami rambut rontok",
-          "Ya, saya mengalami gangguan tidur di malam hari",
-          "Ya, saya mengalami gelisah",
-          "Ya, saya mengalami stres",
-          "Ya, saya mengalami cemas",
-          "Ya, saya mengalami berat badan naik drastis",
-          "Ya, saya mengalami berat badan turun drastis",
-          "Ya, saya mengalami nyeri gigi",
-          "Ya, saya mengalami gusi berdarah",
-          "Ya, saya mengalami masalah gigi dan mulut",
-          "Ya, saya mengalami infeksi jamur",
-          "Ya, saya mengalami luka yang tidak sembuh-sembuh",
-          "Ya, saya mengalami keringat berlebihan",
-          "Ya, saya mengalami masalah kulit"
-        ],
-        "responses": [
-            {
-              "response": "Okee, Mom. memiliki keluhan terkait kesehatan, proses pendaftaran tidak bisa dilanjutkan. Jika Mom ingin mencoba lagi, silakan kembali. Terima kasih!",
-              "value": 0
-            },
-            {
-              "response": "Paham, Mom. memiliki keluhan terkait kesehatan, saya tidak bisa melanjutkan pendaftaran. Silakan kembali ke halaman pendaftaran jika Mom ingin mencoba lagi nanti. Sampai jumpa!",
-              "value": 0
-            },
-            {
-              "response": "Oke, Mom. Karena Mom memiliki keluhan terkait kesehatan, pendaftaran tidak dapat dilanjutkan. Terima kasih dan sampai jumpa!",
-              "value": 0
-            },
-            {
-              "response": "Paham, Mom. Karena Mom memiliki keluhan terkait kesehatan, proses pendaftaran tidak dapat dilanjutkan. Jika Mom ingin mencoba lagi nanti, silakan kembali. Terima kasih dan selamat tinggal!",
-              "value": 0
-            },
-            {
-              "response": "Oke, Mom. Karena Mom memiliki keluhan terkait kesehatan, saya tidak bisa melanjutkan pendaftaran. Silakan kembali ke halaman pendaftaran jika Mom ingin mencoba lagi. Terima kasih dan sampai jumpa!",
-              "value": 0
-            }
-          ]
-    },
-    {
-        "tag": "pertanyaan5positif",
         "patterns": [
           "Tidak, saya tidak minum vitamin",
           "Tidak, saya tidak minum penguat kandungan",
@@ -720,7 +679,8 @@
           "Tidak, saya tidak minum suplemen vitamin B15",
           "Tidak, saya tidak minum suplemen vitamin B17",
           "Tidak, saya tidak minum suplemen ginkgo biloba",
-          "Tidak, saya tidak minum suplemen ginseng"
+          "Tidak, saya tidak minum suplemen ginseng",
+          "Tidak minum vitamin"
         ],
         "responses": [
           {
@@ -742,7 +702,7 @@
         ]
     },
     {
-        "tag": "pertanyaan5negative",
+        "tag": "pertanyaan4negative",
         "patterns": [
           "Ya, saya minum vitamin",
           "Ya, saya minum penguat kandungan",
@@ -801,7 +761,8 @@
           "Ya, saya minum suplemen vitamin B15",
           "Ya, saya minum suplemen vitamin B17",
           "Ya, saya minum suplemen ginkgo biloba",
-          "Ya, saya minum suplemen ginseng"
+          "Ya, saya minum suplemen ginseng",
+          "Ya minum vitamin"
         ],
         "responses": [
             {
@@ -827,7 +788,7 @@
           ]
     },
     {
-        "tag": "pertanyaan6positif",
+        "tag": "pertanyaan5positif",
         "patterns": [
             "Ya, saya sudah pernah USG dan hasilnya baik",
             "Ya, saya sudah kontrol dan hasilnya baik",
@@ -906,7 +867,7 @@
         ]
     },
     {
-        "tag": "pertanyaan6negative",
+        "tag": "pertanyaan5negative",
         "patterns": [
           "Ya, saya sudah pernah USG dan hasilnya kurang baik",
           "Ya, saya sudah kontrol dan hasilnya kurang baik",
@@ -991,8 +952,12 @@
           ]
     },
     {
-        "tag": "pertanyaan7positif",
+        "tag": "pertanyaan6positif",
         "patterns": [
+            "Tidak pernah keguguran",
+            "Tidak pernah mengalami keguguran",
+            "Gapernah keguguran",
+            "Gapernah mengalami keguguran",
             "Tidak, saya tidak pernah keguguran sebelumnya",
             "Ini adalah kehamilan pertama saya",
             "Tidak, saya belum pernah mengalami keguguran",
@@ -1069,9 +1034,13 @@
         ]
     },
     {
-        "tag": "pertanyaan7negative",
+        "tag": "pertanyaan6negative",
         "patterns": [
-          "Ya, saya pernah keguguran sebelumnya",
+            "Ya pernah keguguran",
+            "Ya pernah mengalami keguguran",
+            "Ya saya pernah keguguran",
+            "Ya saya pernah mengalami keguguran",
+            "Ya, saya pernah keguguran sebelumnya",
             "Ya, saya mengalami keguguran pada kehamilan sebelumnya",
             "Ya, saya pernah mengalami keguguran",
             "Ya, saya mengalami keguguran tahun lalu",
@@ -1151,8 +1120,16 @@
           ]
     },
     {
-      "tag": "pertanyaan8positif",
+      "tag": "pertanyaan7positif",
       "patterns": [
+          "Tidak memiliki riwayat penyakit",
+          "Tidak memiliki riwayat penyakit tersebut",
+          "Tidak punya riwayat penyakit",
+          "Tidak punya riwayat penyakit tesebut",
+          "Tidak, saya tidak punya riwayat penyakit",
+          "Tidak, saya tidak punya riwayat penyakit tersebut",
+          "Tidak, saya tidak memiliki riwayat penyakit",
+          "Tidak, saya tidak memiliki riwayat penyakit tersebut",
           "Tidak, saya tidak memiliki anemia dalam kehamilan",
           "Tidak, saya tidak memiliki hipertensi",
           "Tidak, saya tidak memiliki diabetes melitus",
@@ -1228,9 +1205,17 @@
         ]
   },
   {
-      "tag": "pertanyaan8negative",
+      "tag": "pertanyaan7negative",
       "patterns": [
-        "Ya, saya memiliki anemia dalam kehamilan",
+          "Ya memiliki riwayat penyakit",
+          "Ya memiliki riwayat penyakit tersebut",
+          "Ya punya riwayat penyakit",
+          "Ya punya riwayat penyakit tesebut",
+          "Ya, saya punya riwayat penyakit",
+          "Ya, saya punya riwayat penyakit tersebut",
+          "Ya, saya memiliki riwayat penyakit",
+          "Ya, saya memiliki riwayat penyakit tersebut",
+          "Ya, saya memiliki anemia dalam kehamilan",
           "Ya, saya memiliki hipertensi",
           "Ya, saya memiliki diabetes melitus",
           "Ya, saya mengalami anemia sejak awal kehamilan",
@@ -1311,7 +1296,7 @@
         ]
   },
     {
-        "tag": "pertanyaan9positif",
+        "tag": "pertanyaan8positif",
         "patterns": [
           "Iya, enak banget sih! Saya suka bisa santai dan fokus sama diri sendiri.",
           "Pasti dong! Jadi bisa merasakan momen tenang tanpa gangguan dari luar.",
@@ -1395,7 +1380,7 @@
         ]
     },
     {
-        "tag": "pertanyaan9negative",
+        "tag": "pertanyaan8negative",
         "patterns": [
           "Hmm, sebenarnya tidak. Saya lebih suka ada instruktur yang bisa memandu gerakan.",
           "Ngga ya, saya merasa lebih aman ketika ada orang yang bisa mengawasi gerakan saya.",
