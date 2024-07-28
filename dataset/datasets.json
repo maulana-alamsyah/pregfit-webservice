@@ -1454,12 +1454,7 @@
           "Benar banget! Bikin lebih nyaman.",
           "Iya, enak banget!",
           "Pasti dong, nyaman!",
-          "Iya",
-          "Nyaman",
-          "Pasti",
-          "Benar",
-          "Yup",
-          "Setuju"
+          "Nyaman"
         ],
         "responses": [
           {
@@ -1538,12 +1533,8 @@
           "Tidak nyaman",
           "Ngga nyaman",
           "Ga nyaman",
-          "Tidak",
-          "Ngga",
-          "Ga",
-          "Gak",
-          "Gak nyaman",
-          "Gk"
+          "Gk nyaman",
+          "Gak nyaman"
         ],
         "responses": [
           {
