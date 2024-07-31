@@ -199,7 +199,7 @@ def generate_token(user):
 
 def sendMail(email, otp):
     msg = Message('Verifkasi OTP Preg-Fit', 
-                  sender=('Aplikasi Preg-Fit', 'preg-fit@yopmail.com'), 
+                  sender=('Aplikasi Preg-Fit', 'no-reply@preg-fit.my.id'), 
                   recipients=[email])
     msg.body = "Kode verifikasi OTP kamu adalah " + otp
     msg.html = '''<div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden;">
